@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "components": [
+    "Microsoft.VisualStudio.Workload.NetWeb",
+    "Microsoft.VisualStudio.Workload.ManagedDesktop",
+    "Microsoft.VisualStudio.Component.NuGet",
+    "Microsoft.VisualStudio.Component.DockerTools",
+    "Microsoft.VisualStudio.Component.Node.Tools"
+  ]
+}
