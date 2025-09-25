@@ -78,18 +78,18 @@ export function AppSidebar() {
       <div className="relative flex h-full flex-col">
         <Button
           variant="ghost"
-          size="icon"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           onClick={toggleSidebar}
           className={cn(
-            "group absolute top-6 -right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-sidebar-border/50 bg-gradient-to-br from-sidebar-accent/90 via-sidebar/80 to-sidebar/70 text-sidebar-foreground shadow-[0_18px_48px_-18px_rgba(15,23,42,0.75)] backdrop-blur-xl transition-all duration-300 hover:-right-7 hover:text-sidebar-primary",
-            "after:absolute after:inset-0 after:rounded-full after:border after:border-sidebar-border/40 after:opacity-0 after:transition-opacity after:duration-300 group-hover:after:opacity-100",
+            "group absolute top-1/2 -right-16 z-50 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-3xl border border-sidebar-border/40 bg-gradient-to-br from-sidebar-accent/95 via-sidebar/80 to-sidebar/70 text-sidebar-foreground shadow-[0_18px_48px_-18px_rgba(8,12,24,0.85)] transition-all duration-300",
+            "after:absolute after:inset-0 after:rounded-3xl after:border after:border-primary/30 after:opacity-0 after:transition-opacity after:duration-300 group-hover:after:opacity-100",
+            "hover:-right-[4.75rem] hover:text-sidebar-primary/90",
             collapsed
-              ? "-right-8 bg-sidebar-accent/80 text-sidebar-primary shadow-[0_20px_60px_-24px_rgba(56,189,248,0.65)]"
-              : "hover:bg-sidebar-accent/80 hover:shadow-[0_22px_60px_-26px_rgba(56,189,248,0.45)]",
+              ? "-right-[4.5rem] bg-primary/30 text-primary-foreground shadow-[0_24px_64px_-26px_rgba(56,189,248,0.55)]"
+              : "hover:bg-primary/20 hover:shadow-[0_26px_72px_-32px_rgba(56,189,248,0.45)]",
           )}
         >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
         </Button>
         <SidebarHeader
           className={cn(
