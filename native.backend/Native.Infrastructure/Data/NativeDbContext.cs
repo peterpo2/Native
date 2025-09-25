@@ -17,6 +17,8 @@ public class NativeDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<TaskItem> Tasks => Set<TaskItem>();
     public DbSet<TaskAttachment> TaskAttachments => Set<TaskAttachment>();
+    public DbSet<CalendarBoard> Calendars => Set<CalendarBoard>();
+    public DbSet<CalendarShare> CalendarShares => Set<CalendarShare>();
     public DbSet<CalendarEvent> CalendarEvents => Set<CalendarEvent>();
     public DbSet<JobOpening> JobOpenings => Set<JobOpening>();
     public DbSet<JobApplication> JobApplications => Set<JobApplication>();
@@ -51,6 +53,13 @@ public class NativeDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
             .HasOne<Project>()
             .WithMany(p => p.Tasks)
             .HasForeignKey(t => t.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
+
+        modelBuilder.Entity<TaskItem>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(t => t.OwnerId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<TaskAttachment>()
@@ -58,6 +67,26 @@ public class NativeDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
             .WithMany(t => t.Attachments)
             .HasForeignKey(a => a.TaskId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CalendarBoard>()
+            .Property(c => c.Visibility)
+            .HasConversion<string>()
+            .HasMaxLength(16);
+
+        modelBuilder.Entity<CalendarBoard>()
+            .HasMany(c => c.Events)
+            .WithOne(e => e.Calendar)
+            .HasForeignKey(e => e.CalendarId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CalendarBoard>()
+            .HasMany(c => c.SharedUsers)
+            .WithOne(s => s.Calendar)
+            .HasForeignKey(s => s.CalendarId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CalendarShare>()
+            .HasKey(s => new { s.CalendarId, s.UserId });
 
         modelBuilder.Entity<JobOpening>()
             .HasOne<Organization>()

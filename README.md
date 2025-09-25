@@ -54,6 +54,16 @@ dotnet run --project Native.Api
 
 The API listens on `http://localhost:5000` by default (see `Program.cs` for configuration details).
 
+#### Default accounts
+
+The API seeds a few demo users the first time it starts. All passwords are `Native!123`.
+
+| Role  | Email                  |
+| ----- | ---------------------- |
+| Admin | `admin@native.local`   |
+| User  | `user@native.local`    |
+| Manager | `manager@native.local` |
+
 ## Editor Setup
 
 - **Visual Studio Code** – Recommended extensions are published in [`.vscode/extensions.json`](.vscode/extensions.json). VS Code will prompt you to install them the first time you open the workspace, or you can install them manually with `code --install-extension <extension-id>`.

@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +24,16 @@ public class TaskController : ControllerBase
     {
         _taskService = taskService;
         _hubContext = hubContext;
+    }
+
+    [HttpGet("mine")]
+    public async Task<IActionResult> GetMyTasks(
+        [FromQuery] string? status,
+        [FromQuery] DateTime? dueBefore,
+        CancellationToken cancellationToken)
+    {
+        var tasks = await _taskService.GetTasksForUserAsync(GetUserId(), status, dueBefore, cancellationToken);
+        return Ok(tasks);
     }
 
     [HttpGet("{projectId:guid}")]
@@ -77,10 +88,15 @@ public class TaskController : ControllerBase
             AssigneeId = request.AssigneeId,
             DueAt = request.DueAt,
             Status = string.IsNullOrWhiteSpace(request.Status) ? "Todo" : request.Status!,
-            Priority = string.IsNullOrWhiteSpace(request.Priority) ? "Normal" : request.Priority!
+            Priority = string.IsNullOrWhiteSpace(request.Priority) ? "Normal" : request.Priority!,
+            OwnerId = GetUserId()
         }, cancellationToken);
 
-        await _hubContext.Clients.Group(created.ProjectId.ToString()).SendAsync("taskCreated", created, cancellationToken);
+        if (created.ProjectId.HasValue)
+        {
+            await _hubContext.Clients.Group(created.ProjectId.Value.ToString()).SendAsync("taskCreated", created, cancellationToken);
+        }
+
         return CreatedAtAction(nameof(GetTask), new { taskId = created.Id }, created);
     }
 
@@ -98,5 +114,16 @@ public class TaskController : ControllerBase
         await _taskService.UpdateTaskDetailsAsync(taskId, request.Title, request.Description, request.Priority, request.DueAt, cancellationToken);
         await _hubContext.Clients.All.SendAsync("taskUpdated", new { taskId }, cancellationToken);
         return NoContent();
+    }
+
+    private Guid GetUserId()
+    {
+        var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (id is null || !Guid.TryParse(id, out var userId))
+        {
+            throw new InvalidOperationException("User identifier missing from token");
+        }
+
+        return userId;
     }
 }

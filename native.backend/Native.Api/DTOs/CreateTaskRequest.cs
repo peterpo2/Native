@@ -3,7 +3,7 @@ using System;
 namespace Native.Api.DTOs;
 
 public record CreateTaskRequest(
-    Guid ProjectId,
+    Guid? ProjectId,
     string Title,
     string? Description,
     Guid? AssigneeId,

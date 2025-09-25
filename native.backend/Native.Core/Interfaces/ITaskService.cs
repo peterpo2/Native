@@ -16,6 +16,12 @@ public interface ITaskService
         Guid? assigneeId = null,
         DateTime? dueBefore = null,
         CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<TaskItem>> GetTasksForUserAsync(
+        Guid ownerId,
+        string? status = null,
+        DateTime? dueBefore = null,
+        CancellationToken cancellationToken = default);
     Task<IEnumerable<TaskItem>> SearchTasksAsync(Guid orgId, string query, Guid? projectId = null, CancellationToken cancellationToken = default);
     Task UpdateTaskStatusAsync(Guid taskId, string status, CancellationToken cancellationToken = default);
     Task UpdateTaskDetailsAsync(Guid taskId, string? title, string? description, string? priority, DateTime? dueAt, CancellationToken cancellationToken = default);
