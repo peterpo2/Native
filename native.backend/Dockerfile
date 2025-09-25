@@ -16,5 +16,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:8080
+ENV ConnectionStrings__Default="Server=db,1433;Database=native;User Id=sa;Password=Xyzzy2005!;TrustServerCertificate=True;Encrypt=False"
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "Native.Api.dll"]
