@@ -109,7 +109,7 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 
-  /* Custom scrollbars */
+  /* Custom scroll bars */
   ::-webkit-scrollbar {
     @apply w-2;
   }
