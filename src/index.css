@@ -89,6 +89,16 @@
     --input: 215 25% 15%;
     --ring: 220 90% 56%;
 
+    /* Professional gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(220 90% 56%), hsl(260 85% 65%));
+    --gradient-subtle: linear-gradient(135deg, hsl(215 30% 14%), hsl(215 30% 8%));
+    --gradient-accent: linear-gradient(135deg, hsl(260 70% 50%), hsl(280 75% 60%));
+
+    /* Shadows */
+    --shadow-card: 0 4px 14px hsl(220 40% 4% / 0.45);
+    --shadow-elevated: 0 16px 48px hsl(220 40% 4% / 0.55);
+    --shadow-glow: 0 0 24px hsl(220 90% 56% / 0.35);
+
     --sidebar-background: 215 30% 6%;
     --sidebar-foreground: 0 0% 90%;
     --sidebar-primary: 220 90% 56%;
