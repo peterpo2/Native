@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Native.Api.DTOs;
@@ -34,10 +37,20 @@ public class CalendarController : ControllerBase
             TaskId = request.TaskId,
             Provider = request.Provider,
             ExternalEventId = request.ExternalEventId,
+            Title = request.Title,
+            Location = request.Location,
             Start = request.Start,
-            End = request.End
+            End = request.End,
+            IsAllDay = request.IsAllDay
         }, cancellationToken);
 
         return Ok(calendarEvent);
+    }
+
+    [HttpDelete("{eventId:guid}")]
+    public async Task<IActionResult> Delete(Guid eventId, CancellationToken cancellationToken)
+    {
+        await _calendarService.DeleteEventAsync(eventId, cancellationToken);
+        return NoContent();
     }
 }

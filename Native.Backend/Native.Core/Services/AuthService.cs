@@ -1,11 +1,17 @@
+using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Native.Core.Entities;
 using Native.Core.Interfaces;
+using Native.Core.Models;
 
 namespace Native.Core.Services;
 
@@ -41,7 +47,7 @@ public class AuthService : IAuthService
         return (true, Array.Empty<string>());
     }
 
-    public async Task<string?> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
+    public async Task<AuthResult?> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user is null)
@@ -57,21 +63,26 @@ public class AuthService : IAuthService
 
         var authClaims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
-            new Claim(ClaimTypes.Name, user.FullName),
-            new Claim(ClaimTypes.Role, user.Role)
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+            new(ClaimTypes.Name, user.FullName),
+            new(ClaimTypes.Role, user.Role)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+        var expiresAt = DateTime.UtcNow.AddHours(8);
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
-            expires: DateTime.UtcNow.AddHours(8),
+            expires: expiresAt,
             claims: authClaims,
             signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return new AuthResult(
+            new JwtSecurityTokenHandler().WriteToken(token),
+            expiresAt,
+            new UserSummary(user.Id, user.Email ?? string.Empty, user.FullName, user.Role));
     }
 }

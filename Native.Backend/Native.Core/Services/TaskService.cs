@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Native.Core.Entities;
 using Native.Core.Interfaces;
 
@@ -14,6 +18,8 @@ public class TaskService : ITaskService
 
     public async Task<TaskItem> CreateTaskAsync(TaskItem task, CancellationToken cancellationToken = default)
     {
+        task.Status = string.IsNullOrWhiteSpace(task.Status) ? "Todo" : task.Status;
+        task.Priority = string.IsNullOrWhiteSpace(task.Priority) ? "Normal" : task.Priority;
         var created = await _taskRepository.AddAsync(task, cancellationToken);
         await _taskRepository.SaveChangesAsync(cancellationToken);
         return created;
@@ -22,14 +28,61 @@ public class TaskService : ITaskService
     public Task<TaskItem?> GetTaskAsync(Guid taskId, CancellationToken cancellationToken = default)
         => _taskRepository.GetByIdAsync(taskId, cancellationToken);
 
-    public Task<IEnumerable<TaskItem>> GetTasksAsync(Guid projectId, CancellationToken cancellationToken = default)
-        => _taskRepository.GetByProjectAsync(projectId, cancellationToken);
+    public Task<IEnumerable<TaskItem>> GetTasksAsync(
+        Guid projectId,
+        string? status = null,
+        Guid? assigneeId = null,
+        DateTime? dueBefore = null,
+        CancellationToken cancellationToken = default)
+        => _taskRepository.GetByProjectAsync(projectId, status, assigneeId, dueBefore, cancellationToken);
+
+    public Task<IEnumerable<TaskItem>> SearchTasksAsync(Guid orgId, string query, Guid? projectId = null, CancellationToken cancellationToken = default)
+        => _taskRepository.SearchAsync(orgId, query, projectId, cancellationToken);
 
     public async Task UpdateTaskStatusAsync(Guid taskId, string status, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            throw new ArgumentException("Status cannot be empty", nameof(status));
+        }
+
         var task = await _taskRepository.GetByIdAsync(taskId, cancellationToken)
                    ?? throw new KeyNotFoundException($"Task {taskId} not found");
         task.Status = status;
+        task.CompletedAt = status.Equals("Done", StringComparison.OrdinalIgnoreCase)
+            ? DateTime.UtcNow
+            : null;
+        await _taskRepository.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateTaskDetailsAsync(
+        Guid taskId,
+        string? title,
+        string? description,
+        string? priority,
+        DateTime? dueAt,
+        CancellationToken cancellationToken = default)
+    {
+        var task = await _taskRepository.GetByIdAsync(taskId, cancellationToken)
+                   ?? throw new KeyNotFoundException($"Task {taskId} not found");
+
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            task.Title = title!;
+        }
+
+        if (description is not null)
+        {
+            task.Description = description;
+        }
+
+        if (!string.IsNullOrWhiteSpace(priority))
+        {
+            task.Priority = priority!;
+        }
+
+        task.DueAt = dueAt;
+
         await _taskRepository.SaveChangesAsync(cancellationToken);
     }
 }

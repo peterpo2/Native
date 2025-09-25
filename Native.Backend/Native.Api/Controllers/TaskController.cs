@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -23,10 +26,44 @@ public class TaskController : ControllerBase
     }
 
     [HttpGet("{projectId:guid}")]
-    public async Task<IActionResult> GetTasks(Guid projectId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetTasks(
+        Guid projectId,
+        [FromQuery] string? status,
+        [FromQuery] Guid? assigneeId,
+        [FromQuery] DateTime? dueBefore,
+        CancellationToken cancellationToken)
     {
-        var tasks = await _taskService.GetTasksAsync(projectId, cancellationToken);
+        var tasks = await _taskService.GetTasksAsync(projectId, status, assigneeId, dueBefore, cancellationToken);
         return Ok(tasks);
+    }
+
+    [HttpGet("{projectId:guid}/search")]
+    public async Task<IActionResult> Search(Guid projectId, [FromQuery] Guid orgId, [FromQuery] string query, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return BadRequest("Query cannot be empty");
+        }
+
+        if (orgId == Guid.Empty)
+        {
+            return BadRequest("orgId is required");
+        }
+
+        var tasks = await _taskService.SearchTasksAsync(orgId, query, projectId, cancellationToken);
+        return Ok(tasks);
+    }
+
+    [HttpGet("item/{taskId:guid}")]
+    public async Task<IActionResult> GetTask(Guid taskId, CancellationToken cancellationToken)
+    {
+        var task = await _taskService.GetTaskAsync(taskId, cancellationToken);
+        if (task is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(task);
     }
 
     [HttpPost]
@@ -38,11 +75,13 @@ public class TaskController : ControllerBase
             Title = request.Title,
             Description = request.Description ?? string.Empty,
             AssigneeId = request.AssigneeId,
-            DueAt = request.DueAt
+            DueAt = request.DueAt,
+            Status = string.IsNullOrWhiteSpace(request.Status) ? "Todo" : request.Status!,
+            Priority = string.IsNullOrWhiteSpace(request.Priority) ? "Normal" : request.Priority!
         }, cancellationToken);
 
         await _hubContext.Clients.Group(created.ProjectId.ToString()).SendAsync("taskCreated", created, cancellationToken);
-        return CreatedAtAction(nameof(GetTasks), new { projectId = created.ProjectId }, created);
+        return CreatedAtAction(nameof(GetTask), new { taskId = created.Id }, created);
     }
 
     [HttpPatch("{taskId:guid}/status")]
@@ -50,6 +89,14 @@ public class TaskController : ControllerBase
     {
         await _taskService.UpdateTaskStatusAsync(taskId, request.Status, cancellationToken);
         await _hubContext.Clients.All.SendAsync("taskUpdated", new { taskId, request.Status }, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPatch("{taskId:guid}")]
+    public async Task<IActionResult> UpdateTask(Guid taskId, UpdateTaskDetailsRequest request, CancellationToken cancellationToken)
+    {
+        await _taskService.UpdateTaskDetailsAsync(taskId, request.Title, request.Description, request.Priority, request.DueAt, cancellationToken);
+        await _hubContext.Clients.All.SendAsync("taskUpdated", new { taskId }, cancellationToken);
         return NoContent();
     }
 }

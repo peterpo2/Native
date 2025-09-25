@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Native.Core.Interfaces;
 using Native.Infrastructure.Data;
@@ -27,6 +31,12 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity>
 
     public virtual async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         => await DbSet.FindAsync(new object?[] { id }, cancellationToken);
+
+    public Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default)
+    {
+        DbSet.Remove(entity);
+        return Task.CompletedTask;
+    }
 
     public Task SaveChangesAsync(CancellationToken cancellationToken = default)
         => Context.SaveChangesAsync(cancellationToken);

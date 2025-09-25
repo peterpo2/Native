@@ -1,3 +1,10 @@
+using System;
+
 namespace Native.Api.DTOs;
 
-public record RegisterRequest(string Email, string Password, string FullName, string Role);
+public record RegisterRequest(
+    string Email,
+    string Password,
+    string FullName,
+    string Role,
+    Guid? OrganizationId);

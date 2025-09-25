@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Native.Core.Entities;
 using Native.Core.Interfaces;
 
@@ -26,10 +30,21 @@ public class CalendarService : ICalendarService
         existing.Provider = calendarEvent.Provider;
         existing.Start = calendarEvent.Start;
         existing.End = calendarEvent.End;
+        existing.Title = calendarEvent.Title;
+        existing.Location = calendarEvent.Location;
+        existing.IsAllDay = calendarEvent.IsAllDay;
         await _calendarRepository.SaveChangesAsync(cancellationToken);
         return existing;
     }
 
     public Task<IEnumerable<CalendarEvent>> GetEventsForTaskAsync(Guid taskId, CancellationToken cancellationToken = default)
         => _calendarRepository.GetByTaskAsync(taskId, cancellationToken);
+
+    public async Task DeleteEventAsync(Guid eventId, CancellationToken cancellationToken = default)
+    {
+        var calendarEvent = await _calendarRepository.GetByIdAsync(eventId, cancellationToken)
+                             ?? throw new KeyNotFoundException($"Event {eventId} not found");
+        await _calendarRepository.RemoveAsync(calendarEvent, cancellationToken);
+        await _calendarRepository.SaveChangesAsync(cancellationToken);
+    }
 }
