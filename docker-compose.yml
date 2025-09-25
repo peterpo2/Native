@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./Native.Backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    # Uncomment the following lines to enable hot reload with local files
+    # volumes:
+    #   - ./Native.Backend:/src
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:5000
+    depends_on:
+      - backend
+    # Uncomment to enable live editing with local files
+    # volumes:
+    #   - ./:/app
+    #   - /app/node_modules

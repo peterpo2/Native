@@ -1,73 +1,72 @@
-# Welcome to your Lovable project
+# Native CRM
 
-## Project info
+A monorepo that powers the Native CRM experience with a React + Vite frontend and an ASP.NET Core backend.
 
-**URL**: https://lovable.dev/projects/4a0bbf0b-8a36-4a18-af4a-7b609b04de02
+## Project Structure
 
-## How can I edit this code?
+- `src/`, `public/` – Frontend application built with React, TypeScript, Tailwind CSS, and shadcn-ui.
+- `Native.Backend/` – ASP.NET Core 8 solution containing API, Core, Infrastructure, and Workers projects.
+- `docker-compose.yml` – Spins up both the frontend and backend with a single command.
 
-There are several ways of editing your application.
+## Prerequisites
 
-**Use Lovable**
+- Node.js 20+
+- npm 9+
+- .NET SDK 8.0+
+- Docker Desktop (optional, required for containerised development)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4a0bbf0b-8a36-4a18-af4a-7b609b04de02) and start prompting.
+## Local Development
 
-Changes made via Lovable will be committed automatically to this repo.
+### Frontend
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The Vite dev server runs on [http://localhost:5173](http://localhost:5173).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Backend
 
-**Use GitHub Codespaces**
+```bash
+cd Native.Backend
+dotnet restore
+cd Native.Api
+dotnet run
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The API listens on `http://localhost:5000` by default (see `Program.cs` for configuration details).
 
-## What technologies are used for this project?
+## Run with Docker
 
-This project is built with:
+You can start both the frontend and backend using Docker Compose. This is the easiest way to spin up the full stack without installing the toolchains locally.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```bash
+docker compose up --build
+```
 
-## How can I deploy this project?
+- Frontend is available at [http://localhost:5173](http://localhost:5173)
+- Backend is available at [http://localhost:5000](http://localhost:5000)
 
-Simply open [Lovable](https://lovable.dev/projects/4a0bbf0b-8a36-4a18-af4a-7b609b04de02) and click on Share -> Publish.
+To tear everything down:
 
-## Can I connect a custom domain to my Lovable project?
+```bash
+docker compose down
+```
 
-Yes, you can!
+### Customisation Tips
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- To enable hot reload against your local source code, uncomment the `volumes` sections for the services you want to live-edit in `docker-compose.yml`.
+- Set `VITE_API_URL` in `.env` or the Docker Compose file if your API is hosted elsewhere.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Testing & Linting
+
+- Frontend linting: `npm run lint`
+- Backend tests: `dotnet test` (from within `Native.Backend`)
+
+## Deployment Notes
+
+- Build the frontend for production with `npm run build`. The output is generated under `dist/`.
+- Publish the backend with `dotnet publish Native.Api/Native.Api.csproj -c Release`.
+
+Feel free to tailor the stack, tooling, and deployment strategy to fit your team's workflow.
