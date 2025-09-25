@@ -16,4 +16,10 @@ public interface ITaskRepository : IGenericRepository<TaskItem>
         CancellationToken cancellationToken = default);
 
     Task<IEnumerable<TaskItem>> SearchAsync(Guid orgId, string query, Guid? projectId = null, CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<TaskItem>> GetByOwnerAsync(
+        Guid ownerId,
+        string? status = null,
+        DateTime? dueBefore = null,
+        CancellationToken cancellationToken = default);
 }

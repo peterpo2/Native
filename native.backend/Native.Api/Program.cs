@@ -100,7 +100,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>()
 
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
+builder.Services.AddScoped<ICalendarBoardRepository, CalendarBoardRepository>();
+builder.Services.AddScoped<ICalendarEventRepository, CalendarEventRepository>();
 builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
 builder.Services.AddScoped<ITaskAttachmentRepository, TaskAttachmentRepository>();
 builder.Services.AddScoped<IJobOpeningRepository, JobOpeningRepository>();

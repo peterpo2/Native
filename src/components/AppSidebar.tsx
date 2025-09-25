@@ -1,17 +1,16 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
-  CheckSquare,
-  Calendar,
-  Users,
-  FolderOpen,
+  Target,
   Briefcase,
   Settings,
   Search,
   Plus,
   Bell,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Layout,
+  FileText,
 } from "lucide-react";
 
 import {
@@ -29,18 +28,25 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/context/AuthContext";
 
-const mainNavItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Tasks", url: "/tasks", icon: CheckSquare, badge: "12" },
-  { title: "Calendar", url: "/calendar", icon: Calendar },
-  { title: "People", url: "/people", icon: Users },
-  { title: "Files", url: "/files", icon: FolderOpen },
-  { title: "Careers", url: "/careers", icon: Briefcase, badge: "3" },
+const workspaceNavItems = [
+  { title: "Home", url: "/", icon: LayoutDashboard },
+  { title: "Notifications", url: "/notifications", icon: Bell },
+  { title: "Goals", url: "/goals", icon: Target },
 ];
 
-const settingsItems = [
+const spaceNavItems = [
+  { title: "Everything", url: "/tasks", gradient: "from-emerald-500 to-teal-500", initials: "EV" },
+  { title: "Development", url: "/calendar", gradient: "from-sky-500 to-indigo-500", initials: "DE" },
+  { title: "Marketing", url: "/people", gradient: "from-amber-500 to-orange-500", initials: "MK" },
+  { title: "Product", url: "/files", gradient: "from-fuchsia-500 to-purple-500", initials: "PR" },
+];
+
+const resourcesNavItems = [
+  { title: "Careers", url: "/careers", icon: Briefcase },
+  { title: "Dashboards", url: "/demo", icon: Layout },
+  { title: "Docs", url: "/files", icon: FileText },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
@@ -48,6 +54,7 @@ export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
 
@@ -63,12 +70,12 @@ export function AppSidebar() {
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">N</span>
+              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center text-lg font-bold text-white">
+                N
               </div>
               <div>
                 <h2 className="font-semibold text-sidebar-foreground">Native CRM</h2>
-                <p className="text-xs text-sidebar-foreground/60">Professional Edition</p>
+                <p className="text-xs text-sidebar-foreground/60">Workspace</p>
               </div>
             </div>
           )}
@@ -89,7 +96,7 @@ export function AppSidebar() {
               onClick={() => navigate("/tasks")}
             >
               <Plus className="h-4 w-4 mr-2" />
-              New Task
+              New task
             </Button>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -111,33 +118,24 @@ export function AppSidebar() {
 
       <SidebarContent className="px-2 py-4">
         <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
-            Main
+          <SidebarGroupLabel className={collapsed ? "sr-only" : "uppercase tracking-wide text-xs text-muted-foreground"}>
+            Workspace
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {mainNavItems.map((item) => (
+              {workspaceNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end 
+                    <NavLink
+                      to={item.url}
+                      end
                       className={({ isActive }) => `
                         flex items-center px-3 py-2 rounded-lg transition-all duration-200
                         ${getNavCls({ isActive })}
                       `}
                     >
                       <item.icon className="h-5 w-5 flex-shrink-0" />
-                      {!collapsed && (
-                        <>
-                          <span className="ml-3 flex-1">{item.title}</span>
-                          {item.badge && (
-                            <Badge variant="secondary" className="text-xs">
-                              {item.badge}
-                            </Badge>
-                          )}
-                        </>
-                      )}
+                      {!collapsed && <span className="ml-3 flex-1">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -146,17 +144,47 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup className="mt-8">
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
-            Account
+        <SidebarGroup className="mt-6">
+          <SidebarGroupLabel className={collapsed ? "sr-only" : "uppercase tracking-wide text-xs text-muted-foreground"}>
+            Spaces
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {settingsItems.map((item) => (
+              {spaceNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
+                    <NavLink
+                      to={item.url}
+                      className={({ isActive }) => `
+                        group flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200
+                        ${getNavCls({ isActive })}
+                      `}
+                    >
+                      <div
+                        className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br ${item.gradient} text-xs font-semibold text-white`}
+                      >
+                        {item.initials}
+                      </div>
+                      {!collapsed && <span className="flex-1">{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup className="mt-6">
+          <SidebarGroupLabel className={collapsed ? "sr-only" : "uppercase tracking-wide text-xs text-muted-foreground"}>
+            Resources
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-1">
+              {resourcesNavItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
                       className={({ isActive }) => `
                         flex items-center px-3 py-2 rounded-lg transition-all duration-200
                         ${getNavCls({ isActive })}
@@ -176,28 +204,27 @@ export function AppSidebar() {
       <SidebarFooter className="p-4 border-t">
         <div className="flex items-center space-x-3">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder-avatar.jpg" alt="User" />
+            <AvatarImage src="/placeholder-avatar.jpg" alt={user?.fullName ?? "User"} />
             <AvatarFallback className="bg-gradient-accent text-white text-sm font-medium">
-              JD
+              {user?.fullName
+                ?.split(" ")
+                .map((part) => part[0])
+                .join("")
+                .slice(0, 2)
+                .toUpperCase() || "NA"}
             </AvatarFallback>
           </Avatar>
           {!collapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">John Doe</p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">Admin</p>
+              <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.fullName ?? "Guest"}</p>
+              <p className="text-xs text-sidebar-foreground/60 truncate capitalize">{user?.role ?? "Member"}</p>
             </div>
           )}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => navigate("/notifications")}
-              aria-label="View notifications"
-              className="text-sidebar-foreground/60 transition-colors hover:text-sidebar-foreground"
-            >
-              <Bell className="h-4 w-4" />
-            </button>
-            <div className="absolute -top-1 -right-1 w-2 h-2 bg-accent rounded-full"></div>
-          </div>
+          {!collapsed && (
+            <Button variant="ghost" size="sm" onClick={logout} className="h-8 px-3 text-xs">
+              Sign out
+            </Button>
+          )}
         </div>
       </SidebarFooter>
     </Sidebar>

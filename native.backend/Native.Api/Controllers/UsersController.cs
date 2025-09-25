@@ -11,7 +11,7 @@ namespace Native.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin,Manager")]
+[Authorize]
 public class UsersController : ControllerBase
 {
     private readonly UserManager<User> _userManager;
@@ -24,6 +24,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager")]
     public IActionResult GetUsers()
     {
         var users = _userManager.Users
@@ -40,7 +41,22 @@ public class UsersController : ControllerBase
         return Ok(users);
     }
 
+    [HttpGet("lookup")]
+    public IActionResult Lookup()
+    {
+        var users = _userManager.Users
+            .Select(u => new
+            {
+                u.Id,
+                u.FullName,
+                u.Email
+            })
+            .OrderBy(u => u.FullName);
+        return Ok(users);
+    }
+
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> GetUser(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
@@ -62,6 +78,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPatch("{id:guid}")]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> UpdateUser(Guid id, UpdateUserRequest request)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());

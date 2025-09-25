@@ -71,4 +71,31 @@ public class TaskRepository : GenericRepository<TaskItem>, ITaskRepository
             .Select(x => x.task)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IEnumerable<TaskItem>> GetByOwnerAsync(
+        Guid ownerId,
+        string? status = null,
+        DateTime? dueBefore = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = DbSet.AsNoTracking().Where(t => t.OwnerId == ownerId);
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query = query.Where(t => t.Status == status);
+        }
+
+        if (dueBefore.HasValue)
+        {
+            query = query.Where(t => t.DueAt <= dueBefore.Value);
+        }
+
+        return await query
+            .OrderByDescending(t => t.Priority == "Urgent")
+            .ThenByDescending(t => t.Priority == "High")
+            .ThenByDescending(t => t.Priority == "Normal")
+            .ThenBy(t => t.DueAt ?? DateTime.MaxValue)
+            .ThenByDescending(t => t.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
 }

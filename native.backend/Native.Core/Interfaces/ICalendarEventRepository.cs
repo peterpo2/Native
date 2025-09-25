@@ -6,7 +6,13 @@ using Native.Core.Entities;
 
 namespace Native.Core.Interfaces;
 
-public interface ICalendarRepository : IGenericRepository<CalendarEvent>
+public interface ICalendarEventRepository : IGenericRepository<CalendarEvent>
 {
     Task<IEnumerable<CalendarEvent>> GetByTaskAsync(Guid taskId, CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<CalendarEvent>> GetByCalendarAsync(
+        Guid calendarId,
+        DateTime? start = null,
+        DateTime? end = null,
+        CancellationToken cancellationToken = default);
 }

@@ -18,6 +18,11 @@ public class TaskService : ITaskService
 
     public async Task<TaskItem> CreateTaskAsync(TaskItem task, CancellationToken cancellationToken = default)
     {
+        if (task.OwnerId == Guid.Empty)
+        {
+            throw new ArgumentException("OwnerId is required", nameof(task));
+        }
+
         task.Status = string.IsNullOrWhiteSpace(task.Status) ? "Todo" : task.Status;
         task.Priority = string.IsNullOrWhiteSpace(task.Priority) ? "Normal" : task.Priority;
         var created = await _taskRepository.AddAsync(task, cancellationToken);
@@ -35,6 +40,13 @@ public class TaskService : ITaskService
         DateTime? dueBefore = null,
         CancellationToken cancellationToken = default)
         => _taskRepository.GetByProjectAsync(projectId, status, assigneeId, dueBefore, cancellationToken);
+
+    public Task<IEnumerable<TaskItem>> GetTasksForUserAsync(
+        Guid ownerId,
+        string? status = null,
+        DateTime? dueBefore = null,
+        CancellationToken cancellationToken = default)
+        => _taskRepository.GetByOwnerAsync(ownerId, status, dueBefore, cancellationToken);
 
     public Task<IEnumerable<TaskItem>> SearchTasksAsync(Guid orgId, string query, Guid? projectId = null, CancellationToken cancellationToken = default)
         => _taskRepository.SearchAsync(orgId, query, projectId, cancellationToken);

@@ -6,8 +6,7 @@ public class CalendarEventRequestValidator : AbstractValidator<CalendarEventRequ
 {
     public CalendarEventRequestValidator()
     {
-        RuleFor(x => x.TaskId).NotEmpty();
-        RuleFor(x => x.Provider).NotEmpty();
+        RuleFor(x => x.CalendarId).NotEmpty();
         RuleFor(x => x.Title).NotEmpty().MaximumLength(256);
         RuleFor(x => x.ExternalEventId).MaximumLength(256);
         RuleFor(x => x.Location).MaximumLength(256);

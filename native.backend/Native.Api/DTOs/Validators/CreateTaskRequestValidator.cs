@@ -10,7 +10,9 @@ public class CreateTaskRequestValidator : AbstractValidator<CreateTaskRequest>
 
     public CreateTaskRequestValidator()
     {
-        RuleFor(x => x.ProjectId).NotEmpty();
+        RuleFor(x => x.ProjectId)
+            .Must(id => !id.HasValue || id.Value != Guid.Empty)
+            .WithMessage("ProjectId must be a valid GUID when provided");
         RuleFor(x => x.Title).NotEmpty().MaximumLength(128);
         RuleFor(x => x.Description).MaximumLength(2048);
         RuleFor(x => x.Status)
