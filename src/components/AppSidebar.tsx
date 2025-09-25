@@ -136,7 +136,7 @@ export function AppSidebar() {
               Workspace
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu className={cn("space-y-1", collapsed && "space-y-0 items-center gap-3")}>
+              <SidebarMenu className={cn("space-y-1", collapsed && "space-y-0 gap-3")}>
                 {workspaceNavItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
@@ -167,7 +167,7 @@ export function AppSidebar() {
               Spaces
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu className={cn("space-y-1", collapsed && "space-y-0 items-center gap-3")}>
+              <SidebarMenu className={cn("space-y-1", collapsed && "space-y-0 gap-3")}>
                 {spaceNavItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
@@ -205,7 +205,7 @@ export function AppSidebar() {
               Resources
             </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu className={cn("space-y-1", collapsed && "space-y-0 items-center gap-3")}>
+              <SidebarMenu className={cn("space-y-1", collapsed && "space-y-0 gap-3")}>
                 {resourcesNavItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
