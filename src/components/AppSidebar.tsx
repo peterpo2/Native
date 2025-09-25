@@ -59,8 +59,8 @@ export function AppSidebar() {
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "group relative flex items-center rounded-xl border border-transparent transition-all duration-300",
-      collapsed ? "justify-center p-2" : "px-3 py-2",
+      "group relative flex h-full w-full items-center rounded-xl border border-transparent transition-all duration-300",
+      collapsed ? "justify-center p-0" : "px-3 py-2",
       isActive
         ? "bg-gradient-to-br from-primary/30 via-primary/15 to-primary/5 text-sidebar-primary shadow-[0_18px_40px_-28px_rgba(56,189,248,0.9)] border-primary/40"
         : "text-sidebar-foreground hover:text-sidebar-primary hover:bg-sidebar-accent/50",
@@ -76,21 +76,6 @@ export function AppSidebar() {
       )}
     >
       <div className="relative flex h-full flex-col">
-        <Button
-          variant="ghost"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          onClick={toggleSidebar}
-          className={cn(
-            "group absolute top-1/2 -right-16 z-50 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-3xl border border-sidebar-border/40 bg-gradient-to-br from-sidebar-accent/95 via-sidebar/80 to-sidebar/70 text-sidebar-foreground shadow-[0_18px_48px_-18px_rgba(8,12,24,0.85)] transition-all duration-300",
-            "after:absolute after:inset-0 after:rounded-3xl after:border after:border-primary/30 after:opacity-0 after:transition-opacity after:duration-300 group-hover:after:opacity-100",
-            "hover:-right-[4.75rem] hover:text-sidebar-primary/90",
-            collapsed
-              ? "-right-[4.5rem] bg-primary/30 text-primary-foreground shadow-[0_24px_64px_-26px_rgba(56,189,248,0.55)]"
-              : "hover:bg-primary/20 hover:shadow-[0_26px_72px_-32px_rgba(56,189,248,0.45)]",
-          )}
-        >
-          {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-        </Button>
         <SidebarHeader
           className={cn(
             "p-4 border-b border-sidebar-border/60 transition-all duration-300",
@@ -144,7 +129,7 @@ export function AppSidebar() {
           )}
         </SidebarHeader>
 
-        <SidebarContent className={cn("px-3 py-4 transition-all duration-300", collapsed && "px-2 py-6")}> 
+        <SidebarContent className={cn("px-3 py-4 transition-all duration-300", collapsed && "px-2 py-6")}>
           <SidebarGroup>
             <SidebarGroupLabel className={collapsed ? "sr-only" : "uppercase tracking-wide text-xs text-muted-foreground"}>
               Workspace
@@ -160,7 +145,7 @@ export function AppSidebar() {
                         title={collapsed ? item.title : undefined}
                         className={({ isActive }) => getNavCls({ isActive })}
                       >
-                        <item.icon className={cn("h-5 w-5 flex-shrink-0", collapsed && "mx-auto")} />
+                        <item.icon className={cn("h-6 w-6 flex-shrink-0", collapsed && "mx-auto")} />
                         {!collapsed && <span className="ml-3 flex-1">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
@@ -192,7 +177,7 @@ export function AppSidebar() {
                       >
                         <div
                           className={cn(
-                            "flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br text-xs font-semibold text-white",
+                            "flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br text-sm font-semibold text-white",
                             item.gradient,
                             collapsed && "mx-auto",
                           )}
@@ -222,7 +207,7 @@ export function AppSidebar() {
                         title={collapsed ? item.title : undefined}
                         className={({ isActive }) => getNavCls({ isActive })}
                       >
-                        <item.icon className={cn("h-5 w-5 flex-shrink-0", collapsed && "mx-auto")} />
+                        <item.icon className={cn("h-6 w-6 flex-shrink-0", collapsed && "mx-auto")} />
                         {!collapsed && <span className="ml-3">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
@@ -231,6 +216,27 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+
+          <div className="mt-auto pt-6">
+            <Button
+              variant="ghost"
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              onClick={toggleSidebar}
+              className={cn(
+                "group flex w-full items-center justify-center gap-3 rounded-2xl border border-sidebar-border/60 bg-sidebar/70 px-3 py-3 text-sidebar-foreground transition-all duration-300 hover:border-primary/30 hover:bg-sidebar-accent/40",
+                collapsed
+                  ? "h-12 w-full justify-center border-sidebar-border/40 bg-sidebar/50"
+                  : "justify-between",
+              )}
+            >
+              {!collapsed && <span className="text-sm font-medium">Collapse menu</span>}
+              {collapsed ? (
+                <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+              ) : (
+                <ChevronLeft className="h-5 w-5 transition-transform group-hover:-translate-x-0.5" />
+              )}
+            </Button>
+          </div>
         </SidebarContent>
 
         <SidebarFooter
