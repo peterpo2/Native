@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Target,
@@ -53,27 +53,40 @@ const resourcesNavItems = [
 
 export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
-  const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const currentPath = location.pathname;
   const collapsed = state === "collapsed";
 
-  const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive 
-      ? "bg-sidebar-accent text-sidebar-primary font-medium shadow-sm" 
-      : "hover:bg-sidebar-accent/50 text-sidebar-foreground";
+    cn(
+      "group relative flex items-center rounded-xl border border-transparent transition-all duration-300",
+      collapsed ? "justify-center p-2" : "px-3 py-2",
+      isActive
+        ? "bg-gradient-to-br from-primary/30 via-primary/15 to-primary/5 text-sidebar-primary shadow-[0_18px_40px_-28px_rgba(56,189,248,0.9)] border-primary/40"
+        : "text-sidebar-foreground hover:text-sidebar-primary hover:bg-sidebar-accent/50",
+      collapsed && !isActive && "hover:bg-sidebar-accent/40",
+    );
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border/60 shadow-card">
-      <SidebarHeader className="p-4 border-b border-sidebar-border/60">
+    <Sidebar
+      collapsible="icon"
+      className={cn(
+        "border-r border-sidebar-border/60 bg-sidebar/95 shadow-[0_18px_48px_-20px_rgba(15,23,42,0.9)] backdrop-blur-xl transition-[background,box-shadow,border] duration-300",
+        "data-[state=collapsed]:border-sidebar-border/30 data-[state=collapsed]:bg-sidebar/60 data-[state=collapsed]:shadow-[0_20px_60px_-32px_rgba(15,23,42,0.85)]",
+      )}
+    >
+      <SidebarHeader
+        className={cn(
+          "p-4 border-b border-sidebar-border/60 transition-all duration-300",
+          collapsed && "items-center gap-3 p-3 border-sidebar-border/30",
+        )}
+      >
         <div className="flex items-center justify-between">
           <Link
             to="/"
             className={cn(
-              "group flex w-full items-center rounded-lg px-2 transition-colors hover:bg-sidebar-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-              collapsed ? "justify-center" : "gap-3"
+              "group flex w-full items-center rounded-2xl px-2 transition-colors hover:bg-sidebar-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              collapsed ? "justify-center" : "gap-3",
             )}
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary text-lg font-bold text-white shadow-sm transition-transform group-hover:scale-105">
@@ -90,7 +103,11 @@ export function AppSidebar() {
             variant="ghost"
             size="sm"
             onClick={toggleSidebar}
-            className="h-8 w-8 p-0 hover:bg-sidebar-accent"
+            className={cn(
+              "h-8 w-8 p-0 transition-colors hover:bg-sidebar-accent",
+              collapsed &&
+                "bg-sidebar/70 text-sidebar-foreground shadow-[0_12px_36px_-28px_rgba(94,234,212,0.8)] hover:bg-sidebar-accent/70",
+            )}
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
@@ -123,7 +140,7 @@ export function AppSidebar() {
         )}
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-4">
+      <SidebarContent className={cn("px-2 py-4 transition-all duration-300", collapsed && "px-2 py-6")}> 
         <SidebarGroup>
           <SidebarGroupLabel className={collapsed ? "sr-only" : "uppercase tracking-wide text-xs text-muted-foreground"}>
             Workspace
@@ -136,10 +153,8 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       end
-                      className={({ isActive }) => `
-                        flex items-center px-3 py-2 rounded-lg transition-all duration-200
-                        ${getNavCls({ isActive })}
-                      `}
+                      title={collapsed ? item.title : undefined}
+                      className={({ isActive }) => getNavCls({ isActive })}
                     >
                       <item.icon className="h-5 w-5 flex-shrink-0" />
                       {!collapsed && <span className="ml-3 flex-1">{item.title}</span>}
@@ -162,10 +177,14 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      className={({ isActive }) => `
-                        group flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200
-                        ${getNavCls({ isActive })}
-                      `}
+                      title={collapsed ? item.title : undefined}
+                      className={({ isActive }) =>
+                        cn(
+                          "group flex items-center gap-3 transition-all duration-300",
+                          collapsed ? "justify-center" : "px-3",
+                          getNavCls({ isActive }),
+                        )
+                      }
                     >
                       <div
                         className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br ${item.gradient} text-xs font-semibold text-white`}
@@ -192,10 +211,8 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      className={({ isActive }) => `
-                        flex items-center px-3 py-2 rounded-lg transition-all duration-200
-                        ${getNavCls({ isActive })}
-                      `}
+                      title={collapsed ? item.title : undefined}
+                      className={({ isActive }) => getNavCls({ isActive })}
                     >
                       <item.icon className="h-5 w-5 flex-shrink-0" />
                       {!collapsed && <span className="ml-3">{item.title}</span>}
@@ -208,7 +225,12 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t">
+      <SidebarFooter
+        className={cn(
+          "p-4 border-t border-sidebar-border/60 transition-all duration-300",
+          collapsed && "items-center border-sidebar-border/30",
+        )}
+      >
         <div className="flex items-center space-x-3">
           <Avatar className="h-8 w-8">
             <AvatarImage src="/placeholder-avatar.jpg" alt={user?.fullName ?? "User"} />
