@@ -82,8 +82,11 @@ export function AppSidebar() {
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           onClick={toggleSidebar}
           className={cn(
-            "group absolute top-6 -right-5 z-50 h-9 w-9 rounded-full border border-sidebar-border/70 bg-sidebar/90 text-sidebar-foreground shadow-lg backdrop-blur transition-all hover:-right-6 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-            collapsed && "-right-7 bg-sidebar/70 text-sidebar-foreground/90",
+            "group absolute top-6 -right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-sidebar-border/50 bg-gradient-to-br from-sidebar-accent/90 via-sidebar/80 to-sidebar/70 text-sidebar-foreground shadow-[0_18px_48px_-18px_rgba(15,23,42,0.75)] backdrop-blur-xl transition-all duration-300 hover:-right-7 hover:text-sidebar-primary",
+            "after:absolute after:inset-0 after:rounded-full after:border after:border-sidebar-border/40 after:opacity-0 after:transition-opacity after:duration-300 group-hover:after:opacity-100",
+            collapsed
+              ? "-right-8 bg-sidebar-accent/80 text-sidebar-primary shadow-[0_20px_60px_-24px_rgba(56,189,248,0.65)]"
+              : "hover:bg-sidebar-accent/80 hover:shadow-[0_22px_60px_-26px_rgba(56,189,248,0.45)]",
           )}
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
