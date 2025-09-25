@@ -21,20 +21,22 @@ public interface ICalendarService
         string name,
         CalendarVisibility visibility,
         IEnumerable<Guid> sharedUserIds,
+        bool isAdmin,
         CancellationToken cancellationToken = default);
 
-    Task DeleteCalendarAsync(Guid calendarId, Guid requesterId, CancellationToken cancellationToken = default);
+    Task DeleteCalendarAsync(Guid calendarId, Guid requesterId, bool isAdmin, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<CalendarEvent>> GetEventsForCalendarAsync(
         Guid calendarId,
         Guid requesterId,
         DateTime? start,
         DateTime? end,
+        bool isAdmin,
         CancellationToken cancellationToken = default);
 
-    Task<CalendarEvent> UpsertEventAsync(CalendarEvent calendarEvent, Guid requesterId, CancellationToken cancellationToken = default);
+    Task<CalendarEvent> UpsertEventAsync(CalendarEvent calendarEvent, Guid requesterId, bool isAdmin, CancellationToken cancellationToken = default);
 
-    Task DeleteEventAsync(Guid calendarId, Guid eventId, Guid requesterId, CancellationToken cancellationToken = default);
+    Task DeleteEventAsync(Guid calendarId, Guid eventId, Guid requesterId, bool isAdmin, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<CalendarEvent>> GetEventsForTaskAsync(Guid taskId, CancellationToken cancellationToken = default);
 }

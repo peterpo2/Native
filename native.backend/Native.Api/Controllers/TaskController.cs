@@ -1,5 +1,5 @@
 using System;
-using System.Security.Claims;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Native.Api.DTOs;
 using Native.Api.Hubs;
+using Native.Api.Extensions;
 using Native.Core.Entities;
 using Native.Core.Interfaces;
 
@@ -32,7 +33,7 @@ public class TaskController : ControllerBase
         [FromQuery] DateTime? dueBefore,
         CancellationToken cancellationToken)
     {
-        var tasks = await _taskService.GetTasksForUserAsync(GetUserId(), status, dueBefore, cancellationToken);
+        var tasks = await _taskService.GetTasksForUserAsync(User.GetUserId(), status, dueBefore, cancellationToken);
         return Ok(tasks);
     }
 
@@ -89,7 +90,7 @@ public class TaskController : ControllerBase
             DueAt = request.DueAt,
             Status = string.IsNullOrWhiteSpace(request.Status) ? "Todo" : request.Status!,
             Priority = string.IsNullOrWhiteSpace(request.Priority) ? "Normal" : request.Priority!,
-            OwnerId = GetUserId()
+            OwnerId = User.GetUserId()
         }, cancellationToken);
 
         if (created.ProjectId.HasValue)
@@ -103,27 +104,70 @@ public class TaskController : ControllerBase
     [HttpPatch("{taskId:guid}/status")]
     public async Task<IActionResult> UpdateStatus(Guid taskId, UpdateTaskStatusRequest request, CancellationToken cancellationToken)
     {
-        await _taskService.UpdateTaskStatusAsync(taskId, request.Status, cancellationToken);
-        await _hubContext.Clients.All.SendAsync("taskUpdated", new { taskId, request.Status }, cancellationToken);
-        return NoContent();
+        try
+        {
+            await _taskService.UpdateTaskStatusAsync(
+                taskId,
+                User.GetUserId(),
+                request.Status,
+                User.IsAdmin(),
+                cancellationToken);
+            await _hubContext.Clients.All.SendAsync("taskUpdated", new { taskId, request.Status }, cancellationToken);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
     }
 
     [HttpPatch("{taskId:guid}")]
     public async Task<IActionResult> UpdateTask(Guid taskId, UpdateTaskDetailsRequest request, CancellationToken cancellationToken)
     {
-        await _taskService.UpdateTaskDetailsAsync(taskId, request.Title, request.Description, request.Priority, request.DueAt, cancellationToken);
-        await _hubContext.Clients.All.SendAsync("taskUpdated", new { taskId }, cancellationToken);
-        return NoContent();
+        try
+        {
+            await _taskService.UpdateTaskDetailsAsync(
+                taskId,
+                User.GetUserId(),
+                request.Title,
+                request.Description,
+                request.Priority,
+                request.DueAt,
+                User.IsAdmin(),
+                cancellationToken);
+            await _hubContext.Clients.All.SendAsync("taskUpdated", new { taskId }, cancellationToken);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
     }
 
-    private Guid GetUserId()
+    [HttpDelete("{taskId:guid}")]
+    public async Task<IActionResult> DeleteTask(Guid taskId, CancellationToken cancellationToken)
     {
-        var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (id is null || !Guid.TryParse(id, out var userId))
+        try
         {
-            throw new InvalidOperationException("User identifier missing from token");
+            await _taskService.DeleteTaskAsync(taskId, User.GetUserId(), User.IsAdmin(), cancellationToken);
+            await _hubContext.Clients.All.SendAsync("taskDeleted", new { taskId }, cancellationToken);
+            return NoContent();
         }
-
-        return userId;
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
     }
 }

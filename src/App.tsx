@@ -19,6 +19,8 @@ import Register from "./pages/Register";
 import Goals from "./pages/Goals";
 import { AuthProvider } from "./context/AuthContext";
 import { RequireAuth } from "./components/RequireAuth";
+import { RequireAdmin } from "./components/RequireAdmin";
+import AdminUsers from "./pages/AdminUsers";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,9 @@ const App = () => (
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/demo" element={<Demo />} />
               <Route path="/goals" element={<Goals />} />
+              <Route element={<RequireAdmin />}>
+                <Route path="/admin/users" element={<AdminUsers />} />
+              </Route>
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
