@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Layout,
   FileText,
+  ShieldCheck,
 } from "lucide-react";
 
 import {
@@ -48,6 +49,10 @@ const resourcesNavItems = [
   { title: "Dashboards", url: "/demo", icon: Layout },
   { title: "Docs", url: "/files", icon: FileText },
   { title: "Settings", url: "/settings", icon: Settings },
+];
+
+const adminNavItems = [
+  { title: "User management", url: "/admin/users", icon: ShieldCheck },
 ];
 
 export function AppSidebar() {
@@ -199,6 +204,34 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {user?.role.toLowerCase() === "admin" && (
+          <SidebarGroup className="mt-6">
+            <SidebarGroupLabel className={collapsed ? "sr-only" : "uppercase tracking-wide text-xs text-muted-foreground"}>
+              Administration
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="space-y-1">
+                {adminNavItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        className={({ isActive }) => `
+                          flex items-center px-3 py-2 rounded-lg transition-all duration-200
+                          ${getNavCls({ isActive })}
+                        `}
+                      >
+                        <item.icon className="h-5 w-5 flex-shrink-0" />
+                        {!collapsed && <span className="ml-3">{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t">

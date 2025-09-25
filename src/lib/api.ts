@@ -226,3 +226,41 @@ export const fetchUsersLookup = (token: string) =>
     method: "GET",
     token,
   });
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  fullName: string;
+  role: string;
+  organizationId?: string | null;
+  isTwoFactorEnabled: boolean;
+  createdAt: string;
+}
+
+export const fetchUsers = (token: string) =>
+  request<AdminUser[]>("/api/users", {
+    method: "GET",
+    token,
+  });
+
+export interface UpdateUserInput {
+  fullName?: string;
+  role?: string;
+  twoFactorEnabled?: boolean;
+  email?: string;
+  password?: string;
+  organizationId?: string | null;
+}
+
+export const updateUser = (token: string, userId: string, payload: UpdateUserInput) =>
+  request<AdminUser>(`/api/users/${userId}`, {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(payload),
+  });
+
+export const deleteUser = (token: string, userId: string) =>
+  request<void>(`/api/users/${userId}`, {
+    method: "DELETE",
+    token,
+  });

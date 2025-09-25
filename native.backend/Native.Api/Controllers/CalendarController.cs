@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Native.Api.DTOs;
+using Native.Api.Extensions;
 using Native.Core.Entities;
 using Native.Core.Interfaces;
 
@@ -27,7 +27,7 @@ public class CalendarController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetCalendars(CancellationToken cancellationToken)
     {
-        var userId = GetUserId();
+        var userId = User.GetUserId();
         var calendars = await _calendarService.GetCalendarsForUserAsync(userId, cancellationToken);
         var response = calendars.Select(ToSummary);
         return Ok(response);
@@ -41,7 +41,7 @@ public class CalendarController : ControllerBase
             return BadRequest("Visibility must be Private, Shared, or Public");
         }
 
-        var userId = GetUserId();
+        var userId = User.GetUserId();
         var calendar = await _calendarService.CreateCalendarAsync(new CalendarBoard
         {
             OwnerId = userId,
@@ -64,10 +64,11 @@ public class CalendarController : ControllerBase
         {
             var updated = await _calendarService.UpdateCalendarAsync(
                 calendarId,
-                GetUserId(),
+                User.GetUserId(),
                 request.Name,
                 visibility,
                 request.SharedUserIds ?? Array.Empty<Guid>(),
+                User.IsAdmin(),
                 cancellationToken);
             return Ok(ToSummary(updated));
         }
@@ -86,7 +87,7 @@ public class CalendarController : ControllerBase
     {
         try
         {
-            await _calendarService.DeleteCalendarAsync(calendarId, GetUserId(), cancellationToken);
+            await _calendarService.DeleteCalendarAsync(calendarId, User.GetUserId(), User.IsAdmin(), cancellationToken);
             return NoContent();
         }
         catch (KeyNotFoundException)
@@ -108,8 +109,18 @@ public class CalendarController : ControllerBase
     {
         try
         {
-            var events = await _calendarService.GetEventsForCalendarAsync(calendarId, GetUserId(), start, end, cancellationToken);
+            var events = await _calendarService.GetEventsForCalendarAsync(
+                calendarId,
+                User.GetUserId(),
+                start,
+                end,
+                User.IsAdmin(),
+                cancellationToken);
             return Ok(events);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
         }
         catch (UnauthorizedAccessException)
         {
@@ -139,7 +150,7 @@ public class CalendarController : ControllerBase
                 IsAllDay = request.IsAllDay,
                 Provider = request.Provider ?? "Native",
                 ExternalEventId = request.ExternalEventId ?? string.Empty,
-            }, GetUserId(), cancellationToken);
+            }, User.GetUserId(), User.IsAdmin(), cancellationToken);
 
             return Ok(calendarEvent);
         }
@@ -158,7 +169,7 @@ public class CalendarController : ControllerBase
     {
         try
         {
-            await _calendarService.DeleteEventAsync(calendarId, eventId, GetUserId(), cancellationToken);
+            await _calendarService.DeleteEventAsync(calendarId, eventId, User.GetUserId(), User.IsAdmin(), cancellationToken);
             return NoContent();
         }
         catch (KeyNotFoundException)
@@ -176,17 +187,6 @@ public class CalendarController : ControllerBase
     {
         var events = await _calendarService.GetEventsForTaskAsync(taskId, cancellationToken);
         return Ok(events);
-    }
-
-    private Guid GetUserId()
-    {
-        var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (id is null || !Guid.TryParse(id, out var userId))
-        {
-            throw new InvalidOperationException("User identifier missing from token");
-        }
-
-        return userId;
     }
 
     private static bool TryParseVisibility(string visibility, out CalendarVisibility result)

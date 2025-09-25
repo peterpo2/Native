@@ -24,7 +24,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin,Manager")]
+[Authorize(Roles = "Admin")]
     public IActionResult GetUsers()
     {
         var users = _userManager.Users
@@ -56,7 +56,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = "Admin,Manager")]
+[Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUser(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
@@ -78,7 +78,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPatch("{id:guid}")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateUser(Guid id, UpdateUserRequest request)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
@@ -95,6 +95,44 @@ public class UsersController : ControllerBase
         if (!string.IsNullOrWhiteSpace(request.FullName))
         {
             user.FullName = request.FullName!;
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Email) && !string.Equals(user.Email, request.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            var setEmailResult = await _userManager.SetEmailAsync(user, request.Email!);
+            if (!setEmailResult.Succeeded)
+            {
+                return BadRequest(new { errors = setEmailResult.Errors.Select(e => e.Description) });
+            }
+
+            var setUserNameResult = await _userManager.SetUserNameAsync(user, request.Email!);
+            if (!setUserNameResult.Succeeded)
+            {
+                return BadRequest(new { errors = setUserNameResult.Errors.Select(e => e.Description) });
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Password))
+        {
+            if (await _userManager.HasPasswordAsync(user))
+            {
+                var removeResult = await _userManager.RemovePasswordAsync(user);
+                if (!removeResult.Succeeded)
+                {
+                    return BadRequest(new { errors = removeResult.Errors.Select(e => e.Description) });
+                }
+            }
+
+            var addPasswordResult = await _userManager.AddPasswordAsync(user, request.Password!);
+            if (!addPasswordResult.Succeeded)
+            {
+                return BadRequest(new { errors = addPasswordResult.Errors.Select(e => e.Description) });
+            }
+        }
+
+        if (request.OrganizationId.HasValue)
+        {
+            user.OrganizationId = request.OrganizationId;
         }
 
         if (!string.IsNullOrWhiteSpace(request.Role))
@@ -129,5 +167,24 @@ public class UsersController : ControllerBase
             user.OrganizationId,
             user.IsTwoFactorEnabled
         });
+    }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteUser(Guid id)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        var result = await _userManager.DeleteAsync(user);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
+        }
+
+        return NoContent();
     }
 }

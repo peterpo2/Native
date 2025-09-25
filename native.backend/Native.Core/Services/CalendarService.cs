@@ -42,12 +42,13 @@ public class CalendarService : ICalendarService
         string name,
         CalendarVisibility visibility,
         IEnumerable<Guid> sharedUserIds,
+        bool isAdmin,
         CancellationToken cancellationToken = default)
     {
         var calendar = await _calendarRepository.GetWithSharesAsync(calendarId, cancellationToken)
                        ?? throw new KeyNotFoundException($"Calendar {calendarId} not found");
 
-        if (calendar.OwnerId != requesterId)
+        if (!isAdmin && calendar.OwnerId != requesterId)
         {
             throw new UnauthorizedAccessException("Only the owner can update the calendar");
         }
@@ -65,12 +66,12 @@ public class CalendarService : ICalendarService
         return calendar;
     }
 
-    public async Task DeleteCalendarAsync(Guid calendarId, Guid requesterId, CancellationToken cancellationToken = default)
+    public async Task DeleteCalendarAsync(Guid calendarId, Guid requesterId, bool isAdmin, CancellationToken cancellationToken = default)
     {
         var calendar = await _calendarRepository.GetWithSharesAsync(calendarId, cancellationToken)
                        ?? throw new KeyNotFoundException($"Calendar {calendarId} not found");
 
-        if (calendar.OwnerId != requesterId)
+        if (!isAdmin && calendar.OwnerId != requesterId)
         {
             throw new UnauthorizedAccessException("Only the owner can delete the calendar");
         }
@@ -84,22 +85,51 @@ public class CalendarService : ICalendarService
         Guid requesterId,
         DateTime? start,
         DateTime? end,
+        bool isAdmin,
         CancellationToken cancellationToken = default)
     {
-        var calendar = await _calendarRepository.GetAccessibleCalendarAsync(calendarId, requesterId, cancellationToken);
+        CalendarBoard? calendar;
+        if (isAdmin)
+        {
+            calendar = await _calendarRepository.GetByIdAsync(calendarId, cancellationToken);
+        }
+        else
+        {
+            calendar = await _calendarRepository.GetAccessibleCalendarAsync(calendarId, requesterId, cancellationToken);
+        }
+
         if (calendar is null)
         {
+            if (isAdmin)
+            {
+                throw new KeyNotFoundException($"Calendar {calendarId} not found");
+            }
+
             throw new UnauthorizedAccessException("You do not have access to this calendar");
         }
 
         return await _calendarEventRepository.GetByCalendarAsync(calendarId, start, end, cancellationToken);
     }
 
-    public async Task<CalendarEvent> UpsertEventAsync(CalendarEvent calendarEvent, Guid requesterId, CancellationToken cancellationToken = default)
+    public async Task<CalendarEvent> UpsertEventAsync(CalendarEvent calendarEvent, Guid requesterId, bool isAdmin, CancellationToken cancellationToken = default)
     {
-        var calendar = await _calendarRepository.GetAccessibleCalendarAsync(calendarEvent.CalendarId, requesterId, cancellationToken);
+        CalendarBoard? calendar;
+        if (isAdmin)
+        {
+            calendar = await _calendarRepository.GetByIdAsync(calendarEvent.CalendarId, cancellationToken);
+        }
+        else
+        {
+            calendar = await _calendarRepository.GetAccessibleCalendarAsync(calendarEvent.CalendarId, requesterId, cancellationToken);
+        }
+
         if (calendar is null)
         {
+            if (isAdmin)
+            {
+                throw new KeyNotFoundException($"Calendar {calendarEvent.CalendarId} not found");
+            }
+
             throw new UnauthorizedAccessException("You do not have access to this calendar");
         }
 
@@ -135,11 +165,25 @@ public class CalendarService : ICalendarService
         return existing;
     }
 
-    public async Task DeleteEventAsync(Guid calendarId, Guid eventId, Guid requesterId, CancellationToken cancellationToken = default)
+    public async Task DeleteEventAsync(Guid calendarId, Guid eventId, Guid requesterId, bool isAdmin, CancellationToken cancellationToken = default)
     {
-        var calendar = await _calendarRepository.GetAccessibleCalendarAsync(calendarId, requesterId, cancellationToken);
+        CalendarBoard? calendar;
+        if (isAdmin)
+        {
+            calendar = await _calendarRepository.GetByIdAsync(calendarId, cancellationToken);
+        }
+        else
+        {
+            calendar = await _calendarRepository.GetAccessibleCalendarAsync(calendarId, requesterId, cancellationToken);
+        }
+
         if (calendar is null)
         {
+            if (isAdmin)
+            {
+                throw new KeyNotFoundException($"Calendar {calendarId} not found");
+            }
+
             throw new UnauthorizedAccessException("You do not have access to this calendar");
         }
 

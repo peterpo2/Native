@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Native.Api.DTOs;
+using Native.Api.Extensions;
 using Native.Core.Entities;
 using Native.Core.Interfaces;
 
@@ -38,8 +39,7 @@ public class TaskAttachmentsController : ControllerBase
             FileName = request.FileName,
             Url = request.Url,
             Provider = string.IsNullOrWhiteSpace(request.Provider) ? "dropbox" : request.Provider!,
-            LinkedById = request.LinkedById
-        }, cancellationToken);
+        }, User.GetUserId(), cancellationToken);
 
         return CreatedAtAction(nameof(Get), new { taskId }, attachment);
     }
@@ -49,7 +49,7 @@ public class TaskAttachmentsController : ControllerBase
     {
         try
         {
-            await _attachmentService.DeleteAsync(taskId, attachmentId, cancellationToken);
+            await _attachmentService.DeleteAsync(taskId, attachmentId, User.GetUserId(), User.IsAdmin(), cancellationToken);
             return NoContent();
         }
         catch (KeyNotFoundException)
@@ -59,6 +59,10 @@ public class TaskAttachmentsController : ControllerBase
         catch (InvalidOperationException ex)
         {
             return BadRequest(ex.Message);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
         }
     }
 }

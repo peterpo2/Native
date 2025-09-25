@@ -51,7 +51,12 @@ public class TaskService : ITaskService
     public Task<IEnumerable<TaskItem>> SearchTasksAsync(Guid orgId, string query, Guid? projectId = null, CancellationToken cancellationToken = default)
         => _taskRepository.SearchAsync(orgId, query, projectId, cancellationToken);
 
-    public async Task UpdateTaskStatusAsync(Guid taskId, string status, CancellationToken cancellationToken = default)
+    public async Task UpdateTaskStatusAsync(
+        Guid taskId,
+        Guid requesterId,
+        string status,
+        bool isAdmin,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(status))
         {
@@ -60,6 +65,12 @@ public class TaskService : ITaskService
 
         var task = await _taskRepository.GetByIdAsync(taskId, cancellationToken)
                    ?? throw new KeyNotFoundException($"Task {taskId} not found");
+
+        if (!isAdmin && task.OwnerId != requesterId)
+        {
+            throw new UnauthorizedAccessException("You can only update tasks you created");
+        }
+
         task.Status = status;
         task.CompletedAt = status.Equals("Done", StringComparison.OrdinalIgnoreCase)
             ? DateTime.UtcNow
@@ -69,14 +80,21 @@ public class TaskService : ITaskService
 
     public async Task UpdateTaskDetailsAsync(
         Guid taskId,
+        Guid requesterId,
         string? title,
         string? description,
         string? priority,
         DateTime? dueAt,
+        bool isAdmin,
         CancellationToken cancellationToken = default)
     {
         var task = await _taskRepository.GetByIdAsync(taskId, cancellationToken)
                    ?? throw new KeyNotFoundException($"Task {taskId} not found");
+
+        if (!isAdmin && task.OwnerId != requesterId)
+        {
+            throw new UnauthorizedAccessException("You can only update tasks you created");
+        }
 
         if (!string.IsNullOrWhiteSpace(title))
         {
@@ -95,6 +113,20 @@ public class TaskService : ITaskService
 
         task.DueAt = dueAt;
 
+        await _taskRepository.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteTaskAsync(Guid taskId, Guid requesterId, bool isAdmin, CancellationToken cancellationToken = default)
+    {
+        var task = await _taskRepository.GetByIdAsync(taskId, cancellationToken)
+                   ?? throw new KeyNotFoundException($"Task {taskId} not found");
+
+        if (!isAdmin && task.OwnerId != requesterId)
+        {
+            throw new UnauthorizedAccessException("You can only delete tasks you created");
+        }
+
+        await _taskRepository.RemoveAsync(task, cancellationToken);
         await _taskRepository.SaveChangesAsync(cancellationToken);
     }
 }
