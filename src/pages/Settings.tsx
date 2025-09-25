@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -7,9 +8,22 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const Settings = () => {
   const { toast } = useToast();
+  const { resolvedTheme, setTheme } = useTheme();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const isDarkMode = isMounted && resolvedTheme === "dark";
+
+  const handleThemeToggle = (checked: boolean) => {
+    setTheme(checked ? "dark" : "light");
+  };
 
   const handleSave = () => {
     toast({
@@ -45,7 +59,7 @@ const Settings = () => {
                   <p className="text-sm font-medium text-foreground">Dark mode</p>
                   <p className="text-xs text-muted-foreground">Enable adaptive theming for all members.</p>
                 </div>
-                <Switch defaultChecked />
+                <Switch checked={isDarkMode} onCheckedChange={handleThemeToggle} disabled={!isMounted} />
               </div>
               <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
                 <div>
