@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -31,12 +33,14 @@ export function WelcomeBanner() {
               </p>
             </div>
             <div className="flex space-x-3">
-              <Button className="bg-gradient-primary hover:opacity-90 shadow-glow">
-                Get Started
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button asChild className="bg-gradient-primary hover:opacity-90 shadow-glow">
+                <Link to="/tasks">
+                  Get Started
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
-              <Button variant="outline">
-                Watch Demo
+              <Button asChild variant="outline">
+                <Link to="/demo">Watch Demo</Link>
               </Button>
             </div>
           </div>

@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { WelcomeBanner } from "@/components/WelcomeBanner";
 import { TasksOverview } from "@/components/TasksOverview";
@@ -12,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Bell, Settings, Search } from "lucide-react";
 
 const Index = () => {
+  const navigate = useNavigate();
+
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-gradient-subtle">
@@ -24,14 +28,14 @@ const Index = () => {
                 <p className="text-muted-foreground">Welcome back! Here's what's happening today.</p>
               </div>
               <div className="flex items-center space-x-3">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => navigate("/search")}>
                   <Search className="h-4 w-4 mr-2" />
                   Search
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => navigate("/notifications")}>
                   <Bell className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => navigate("/settings")}>
                   <Settings className="h-4 w-4" />
                 </Button>
               </div>

@@ -1,53 +1,65 @@
+import { useNavigate } from "react-router-dom";
+
 import { Plus, UserPlus, FileText, Calendar, Upload, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const quickActions = [
-  {
-    icon: Plus,
-    label: "New Task",
-    description: "Create a task",
-    onClick: () => console.log("New task"),
-    variant: "default" as const
-  },
-  {
-    icon: UserPlus,
-    label: "Add Contact",
-    description: "Add person",
-    onClick: () => console.log("Add contact"),
-    variant: "outline" as const
-  },
-  {
-    icon: Calendar,
-    label: "Schedule Meeting",
-    description: "Book time",
-    onClick: () => console.log("Schedule meeting"),
-    variant: "outline" as const
-  },
-  {
-    icon: FileText,
-    label: "New Document",
-    description: "Create doc",
-    onClick: () => console.log("New document"),
-    variant: "outline" as const
-  },
-  {
-    icon: Upload,
-    label: "Upload File",
-    description: "Add to Dropbox",
-    onClick: () => console.log("Upload file"),
-    variant: "outline" as const
-  },
-  {
-    icon: Briefcase,
-    label: "Post Job",
-    description: "Hire talent",
-    onClick: () => console.log("Post job"),
-    variant: "outline" as const
-  }
-];
+import { useToast } from "@/hooks/use-toast";
 
 export function QuickActions() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const actions = [
+    {
+      icon: Plus,
+      label: "New Task",
+      description: "Create a task",
+      onClick: () => navigate("/tasks"),
+      variant: "default" as const,
+    },
+    {
+      icon: UserPlus,
+      label: "Add Contact",
+      description: "Add person",
+      onClick: () => navigate("/people"),
+      variant: "outline" as const,
+    },
+    {
+      icon: Calendar,
+      label: "Schedule Meeting",
+      description: "Book time",
+      onClick: () => navigate("/calendar"),
+      variant: "outline" as const,
+    },
+    {
+      icon: FileText,
+      label: "New Document",
+      description: "Create doc",
+      onClick: () => navigate("/files"),
+      variant: "outline" as const,
+    },
+    {
+      icon: Upload,
+      label: "Upload File",
+      description: "Add to Dropbox",
+      onClick: () => {
+        navigate("/files");
+        toast({
+          title: "Upload",
+          description: "Connect Dropbox to upload directly from this view.",
+        });
+      },
+      variant: "outline" as const,
+    },
+    {
+      icon: Briefcase,
+      label: "Post Job",
+      description: "Hire talent",
+      onClick: () => navigate("/careers"),
+      variant: "outline" as const,
+    },
+  ];
+
   return (
     <Card className="shadow-card">
       <CardHeader>
@@ -55,7 +67,7 @@ export function QuickActions() {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {quickActions.map((action, index) => (
+          {actions.map((action, index) => (
             <Button
               key={index}
               variant={action.variant}

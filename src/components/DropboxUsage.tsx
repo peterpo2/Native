@@ -1,7 +1,10 @@
+import { useNavigate } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import { Cloud, ExternalLink, FolderKanban } from "lucide-react";
 
 const sharedFolders = [
@@ -23,6 +26,9 @@ const sharedFolders = [
 ];
 
 export function DropboxUsage() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   return (
     <Card className="shadow-card">
       <CardHeader className="space-y-1">
@@ -63,7 +69,18 @@ export function DropboxUsage() {
                   <p className="text-xs text-muted-foreground/80">{folder.updated}</p>
                 </div>
               </div>
-              <Button size="sm" variant="ghost" className="gap-1 text-xs">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="gap-1 text-xs"
+                onClick={() => {
+                  navigate("/files", { state: { folder: folder.name } });
+                  toast({
+                    title: "Opening folder",
+                    description: `${folder.name} is highlighted in the Files view.`,
+                  });
+                }}
+              >
                 Open
                 <ExternalLink className="h-3 w-3" />
               </Button>

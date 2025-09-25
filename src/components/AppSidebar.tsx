@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   CheckSquare,
@@ -48,6 +47,7 @@ const settingsItems = [
 export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
 
@@ -84,7 +84,10 @@ export function AppSidebar() {
         
         {!collapsed && (
           <div className="mt-4 space-y-2">
-            <Button className="w-full bg-gradient-primary hover:opacity-90 shadow-sm">
+            <Button
+              className="w-full bg-gradient-primary hover:opacity-90 shadow-sm"
+              onClick={() => navigate("/tasks")}
+            >
               <Plus className="h-4 w-4 mr-2" />
               New Task
             </Button>
@@ -93,6 +96,12 @@ export function AppSidebar() {
               <input
                 type="text"
                 placeholder="Search..."
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    navigate("/search", { state: { query: event.currentTarget.value } });
+                  }
+                }}
                 className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -179,7 +188,14 @@ export function AppSidebar() {
             </div>
           )}
           <div className="relative">
-            <Bell className="h-4 w-4 text-sidebar-foreground/60 hover:text-sidebar-foreground cursor-pointer" />
+            <button
+              type="button"
+              onClick={() => navigate("/notifications")}
+              aria-label="View notifications"
+              className="text-sidebar-foreground/60 transition-colors hover:text-sidebar-foreground"
+            >
+              <Bell className="h-4 w-4" />
+            </button>
             <div className="absolute -top-1 -right-1 w-2 h-2 bg-accent rounded-full"></div>
           </div>
         </div>

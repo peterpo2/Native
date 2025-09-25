@@ -1,7 +1,10 @@
+import { useNavigate } from "react-router-dom";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { Shield, UserPlus2 } from "lucide-react";
 
 const members = [
@@ -42,11 +45,19 @@ const pendingInvites = [
 ];
 
 export function TeamOverview() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   return (
     <Card className="shadow-card">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-lg font-semibold">Team Management</CardTitle>
-        <Button size="sm" variant="outline" className="gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-2"
+          onClick={() => navigate("/people")}
+        >
           <UserPlus2 className="h-4 w-4" />
           Invite
         </Button>
@@ -99,7 +110,17 @@ export function TeamOverview() {
                   <p className="text-sm font-medium text-foreground">{invite.email}</p>
                   <p className="text-xs text-muted-foreground">{invite.role} · {invite.sent}</p>
                 </div>
-                <Button size="sm" variant="ghost" className="text-xs">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-xs"
+                  onClick={() =>
+                    toast({
+                      title: "Invite resent",
+                      description: `${invite.email} has been notified again.`,
+                    })
+                  }
+                >
                   Resend
                 </Button>
               </div>
