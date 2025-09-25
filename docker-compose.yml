@@ -3,7 +3,7 @@ version: '3.9'
 services:
   backend:
     build:
-      context: ./Native.Backend
+      context: ./backend
       dockerfile: Dockerfile
     ports:
       - "5000:8080"
@@ -15,7 +15,7 @@ services:
       - db
     # Uncomment the following lines to enable hot reload with local files
     # volumes:
-    #   - ./Native.Backend:/src
+    #   - ./backend:/src
 
   frontend:
     build:

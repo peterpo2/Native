@@ -5,7 +5,7 @@ A monorepo that powers the Native CRM experience with a React + Vite frontend an
 ## Project Structure
 
 - `src/`, `public/` – Frontend application built with React, TypeScript, Tailwind CSS, and shadcn-ui.
-- `Native.Backend/` – ASP.NET Core 8 solution containing API, Core, Infrastructure, and Workers projects.
+- `backend/` – ASP.NET Core 8 solution containing API, Core, Infrastructure, and Workers projects.
 - `docker-compose.yml` – Spins up both the frontend and backend with a single command.
 
 ## Prerequisites
@@ -28,9 +28,9 @@ A monorepo that powers the Native CRM experience with a React + Vite frontend an
    ```bash
    npm install
    ```
-4. **Restore .NET dependencies** (the solution file is checked in under `Native.Backend/Native.sln`):
+4. **Restore .NET dependencies** (the solution file is checked in under `backend/Native.sln`):
    ```bash
-   dotnet restore Native.Backend/Native.sln
+   dotnet restore backend/Native.sln
    ```
 5. **Create environment files (if needed)** – copy any sample `.env` files in the repo and adjust values for your environment.
 6. **Run the services** using one of the flows below.
@@ -48,7 +48,7 @@ The Vite dev server runs on [http://localhost:5173](http://localhost:5173).
 ### Backend
 
 ```bash
-cd Native.Backend
+cd backend
 dotnet run --project Native.Api
 ```
 
@@ -57,7 +57,7 @@ The API listens on `http://localhost:5000` by default (see `Program.cs` for conf
 ## Editor Setup
 
 - **Visual Studio Code** – Recommended extensions are published in [`.vscode/extensions.json`](.vscode/extensions.json). VS Code will prompt you to install them the first time you open the workspace, or you can install them manually with `code --install-extension <extension-id>`.
-- **Visual Studio 2022** – Import [`./.vsconfig`](.vsconfig) from `Tools` → `Get Tools and Features…` to automatically install the ASP.NET Core, Docker, and Node.js workloads used by this repository. Once the workloads are installed, open `Native.Backend/Native.sln` (which lives in this repo) so Visual Studio resolves each project path correctly.
+- **Visual Studio 2022** – Import [`./.vsconfig`](.vsconfig) from `Tools` → `Get Tools and Features…` to automatically install the ASP.NET Core, Docker, and Node.js workloads used by this repository. Once the workloads are installed, open `backend/Native.sln` (which lives in this repo) so Visual Studio resolves each project path correctly.
 
 ## Run with Docker
 
@@ -84,7 +84,7 @@ docker compose down
 ## Testing & Linting
 
 - Frontend linting: `npm run lint`
-- Backend tests: `dotnet test` (from within `Native.Backend`)
+- Backend tests: `dotnet test` (from within `backend`)
 
 ## Deployment Notes
 
