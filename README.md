@@ -28,7 +28,7 @@ A monorepo that powers the Native CRM experience with a React + Vite frontend an
    ```bash
    npm install
    ```
-4. **Restore .NET dependencies**:
+4. **Restore .NET dependencies** (the solution file is checked in under `Native.Backend/Native.sln`):
    ```bash
    dotnet restore Native.Backend/Native.sln
    ```
@@ -57,7 +57,7 @@ The API listens on `http://localhost:5000` by default (see `Program.cs` for conf
 ## Editor Setup
 
 - **Visual Studio Code** – Recommended extensions are published in [`.vscode/extensions.json`](.vscode/extensions.json). VS Code will prompt you to install them the first time you open the workspace, or you can install them manually with `code --install-extension <extension-id>`.
-- **Visual Studio 2022** – Import [`./.vsconfig`](.vsconfig) from `Tools` → `Get Tools and Features…` to automatically install the ASP.NET Core, Docker, and Node.js workloads used by this repository. Once the workloads are installed, you can open `Native.Backend/Native.sln` directly.
+- **Visual Studio 2022** – Import [`./.vsconfig`](.vsconfig) from `Tools` → `Get Tools and Features…` to automatically install the ASP.NET Core, Docker, and Node.js workloads used by this repository. Once the workloads are installed, open `Native.Backend/Native.sln` (which lives in this repo) so Visual Studio resolves each project path correctly.
 
 ## Run with Docker
 

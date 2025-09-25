@@ -21,4 +21,5 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
+!Native.Backend/Native.sln
 *.sw?
