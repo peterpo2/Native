@@ -180,14 +180,14 @@ export function AppSidebar() {
                       title={collapsed ? item.title : undefined}
                       className={({ isActive }) =>
                         cn(
-                          "group flex items-center gap-3 transition-all duration-300",
-                          collapsed ? "justify-center" : "px-3",
+                          "group flex items-center transition-all duration-300",
+                          collapsed ? "justify-center gap-0" : "gap-3 px-3",
                           getNavCls({ isActive }),
                         )
                       }
                     >
                       <div
-                        className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br ${item.gradient} text-xs font-semibold text-white`}
+                        className={`flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br ${item.gradient} text-xs font-semibold text-white`}
                       >
                         {item.initials}
                       </div>
