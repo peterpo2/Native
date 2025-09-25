@@ -4,6 +4,10 @@ import { TasksOverview } from "@/components/TasksOverview";
 import { CalendarOverview } from "@/components/CalendarOverview";
 import { QuickActions } from "@/components/QuickActions";
 import { RecentActivity } from "@/components/RecentActivity";
+import { IntegrationStatus } from "@/components/IntegrationStatus";
+import { TeamOverview } from "@/components/TeamOverview";
+import { CareersPipeline } from "@/components/CareersPipeline";
+import { DropboxUsage } from "@/components/DropboxUsage";
 import { Button } from "@/components/ui/button";
 import { Bell, Settings, Search } from "lucide-react";
 
@@ -55,6 +59,18 @@ const Index = () => {
             <div>
               <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
               <QuickActions />
+            </div>
+          </div>
+
+          {/* Operations Hub */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="space-y-6 xl:col-span-2">
+              <IntegrationStatus />
+              <CareersPipeline />
+            </div>
+            <div className="space-y-6">
+              <TeamOverview />
+              <DropboxUsage />
             </div>
           </div>
 
