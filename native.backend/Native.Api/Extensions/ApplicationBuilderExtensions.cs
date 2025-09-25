@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +21,15 @@ public static class ApplicationBuilderExtensions
         var context = services.GetRequiredService<NativeDbContext>();
         if (context.Database.IsRelational())
         {
-            await context.Database.MigrateAsync(cancellationToken);
+             var migrations = context.Database.GetMigrations();
+            if (migrations.Any())
+            {
+                await context.Database.MigrateAsync(cancellationToken);
+            }
+            else
+            {
+                await context.Database.EnsureCreatedAsync(cancellationToken);
+            }
         }
         else
         {
