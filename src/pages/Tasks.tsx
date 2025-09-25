@@ -19,10 +19,10 @@ import { useAuth } from "@/context/AuthContext";
 import { createTask, fetchMyTasks, type TaskInput, type TaskItem } from "@/lib/api";
 
 const statusColors: Record<string, string> = {
-  Todo: "bg-slate-100 text-slate-700",
-  "In Progress": "bg-blue-100 text-blue-700",
-  Review: "bg-amber-100 text-amber-700",
-  Done: "bg-emerald-100 text-emerald-700",
+  Todo: "border border-border/70 bg-muted/40 text-muted-foreground",
+  "In Progress": "border border-primary/40 bg-primary/15 text-primary",
+  Review: "border border-amber-500/40 bg-amber-500/15 text-amber-300",
+  Done: "border border-emerald-500/40 bg-emerald-500/15 text-emerald-300",
 };
 
 const priorities: { label: string; value: TaskInput["priority"] }[] = [
@@ -113,7 +113,7 @@ const Tasks = () => {
   return (
     <DashboardLayout>
       <div className="flex min-h-screen flex-col bg-gradient-subtle">
-        <div className="border-b border-border/40 bg-white/80 backdrop-blur-sm">
+        <div className="border-b border-border/60 bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/70">
           <div className="flex flex-col gap-4 px-6 py-5 md:flex-row md:items-center md:justify-between">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
@@ -309,7 +309,7 @@ const Tasks = () => {
             )}
             {orderedTasks.map((task) => {
               const dueDate = task.dueAt ? format(parseISO(task.dueAt), "MMM d") : "No due date";
-              const statusBadge = statusColors[task.status] ?? "bg-slate-100 text-slate-700";
+              const statusBadge = statusColors[task.status] ?? "border border-border/70 bg-muted/40 text-muted-foreground";
               const completion = task.status === "Done" ? 100 : task.status === "Review" ? 75 : task.status === "In Progress" ? 50 : 15;
               return (
                 <Card key={task.id} className="shadow-card">

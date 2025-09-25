@@ -218,7 +218,7 @@ const Calendar = () => {
   return (
     <DashboardLayout>
       <div className="flex min-h-screen flex-col bg-gradient-subtle">
-        <div className="border-b border-border/40 bg-white/80 backdrop-blur-sm">
+        <div className="border-b border-border/60 bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/70">
           <div className="flex flex-col gap-4 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
@@ -521,7 +521,7 @@ const Calendar = () => {
                     const key = format(day, "yyyy-MM-dd");
                     const events = groupedEvents.get(key) ?? [];
                     return (
-                      <div key={key} className="rounded-xl border border-border/60 bg-white/70 p-3 shadow-sm">
+                      <div key={key} className="rounded-xl border border-border/60 bg-card/80 p-3 shadow-sm">
                         <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
                           <span className="uppercase">{format(day, "EEE")}</span>
                           <Badge variant={isToday(day) ? "default" : "outline"} className="rounded-full px-2 py-0 text-[10px]">
@@ -537,7 +537,7 @@ const Calendar = () => {
                               const end = format(parseISO(event.end), "p");
                               const hasTask = Boolean(event.taskId);
                               return (
-                                <div key={event.id} className="space-y-1 rounded-lg border border-border/50 bg-gradient-to-br from-primary/10 via-white to-white p-3 text-xs">
+                                  <div key={event.id} className="space-y-1 rounded-lg border border-border/50 bg-gradient-to-br from-primary/25 via-primary/15 to-primary/5 p-3 text-xs">
                                   <div className="flex items-center justify-between gap-2">
                                     <p className="font-semibold text-foreground line-clamp-2">{event.title}</p>
                                     {hasTask && <Badge variant="outline">Task</Badge>}
@@ -564,7 +564,7 @@ const Calendar = () => {
                 <CardContent className="space-y-3 text-sm text-muted-foreground">
                   {upcomingTasksWithoutEvents.length === 0 && <p>All tasks are already scheduled on your calendars.</p>}
                   {upcomingTasksWithoutEvents.map((task) => (
-                    <div key={task.id} className="rounded-lg border border-border/40 bg-white/70 p-3 shadow-sm">
+                    <div key={task.id} className="rounded-lg border border-border/40 bg-card/80 p-3 shadow-sm">
                       <p className="font-medium text-foreground">{task.title}</p>
                       <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
                         <span>{task.status}</span>
@@ -581,7 +581,7 @@ const Calendar = () => {
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm text-muted-foreground">
                   {calendarsQuery.data?.map((calendar) => (
-                    <div key={calendar.id} className="flex items-center justify-between rounded-lg border border-border/50 bg-white/80 px-3 py-2">
+                    <div key={calendar.id} className="flex items-center justify-between rounded-lg border border-border/50 bg-card/80 px-3 py-2">
                       <div>
                         <p className="font-medium text-foreground">{calendar.name}</p>
                         <p className="text-xs text-muted-foreground">{calendar.visibility} • {calendar.sharedUserIds.length} collaborators</p>

@@ -56,7 +56,7 @@ const Notifications = () => {
             </CardHeader>
             <CardContent className="space-y-3">
               {updates.map((update) => (
-                <div key={update.title} className="flex flex-col gap-1 rounded-lg border border-border/60 bg-white/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div key={update.title} className="flex flex-col gap-1 rounded-lg border border-border/60 bg-card/80 p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm font-semibold text-foreground">{update.title}</p>
                     <p className="text-xs text-muted-foreground">{update.time}</p>

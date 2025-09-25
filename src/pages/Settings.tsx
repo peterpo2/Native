@@ -37,11 +37,11 @@ const Settings = () => {
       <div className="flex min-h-screen flex-col bg-gradient-subtle">
         <PageHeader
           title="Settings"
-          description="Update workspace branding, notification preferences, and security controls."
+          description="Update workspace branding and notification preferences for your team."
         />
 
-        <div className="grid gap-6 p-6 lg:grid-cols-[1.5fr,1fr]">
-          <Card className="shadow-card">
+        <div className="p-6">
+          <Card className="mx-auto w-full max-w-3xl shadow-card">
             <CardHeader>
               <CardTitle className="text-lg font-semibold text-foreground">Workspace preferences</CardTitle>
             </CardHeader>
@@ -54,14 +54,14 @@ const Settings = () => {
                 <Label htmlFor="workspace-url">Workspace URL</Label>
                 <Input id="workspace-url" defaultValue="nativecrm.app/native" />
               </div>
-              <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
+              <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
                 <div>
                   <p className="text-sm font-medium text-foreground">Dark mode</p>
                   <p className="text-xs text-muted-foreground">Enable adaptive theming for all members.</p>
                 </div>
                 <Switch checked={isDarkMode} onCheckedChange={handleThemeToggle} disabled={!isMounted} />
               </div>
-              <div className="flex items-center justify-between rounded-lg bg-muted/30 px-3 py-2">
+              <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
                 <div>
                   <p className="text-sm font-medium text-foreground">Weekly digest</p>
                   <p className="text-xs text-muted-foreground">Send a summary of activity every Monday.</p>
@@ -75,17 +75,6 @@ const Settings = () => {
                 Save changes
               </Button>
             </CardFooter>
-          </Card>
-
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-foreground">Security</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <p>• SSO is enabled for admins and managers.</p>
-              <p>• Two-factor authentication is required for all members.</p>
-              <p>• 3 active API tokens with least-privilege access.</p>
-            </CardContent>
           </Card>
         </div>
       </div>

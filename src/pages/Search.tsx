@@ -72,7 +72,7 @@ const Search = () => {
               </div>
               <div className="space-y-3">
                 {results.map((result) => (
-                  <div key={result.title} className="rounded-lg border border-border/60 bg-white/70 p-4">
+                  <div key={result.title} className="rounded-lg border border-border/60 bg-card/80 p-4">
                     <p className="text-sm font-semibold text-foreground">{result.title}</p>
                     <p className="text-xs text-muted-foreground">{result.context}</p>
                     <p className="text-xs text-muted-foreground/70">{result.type}</p>

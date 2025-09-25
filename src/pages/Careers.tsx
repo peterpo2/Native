@@ -77,7 +77,7 @@ const Careers = () => {
             </CardHeader>
             <CardContent className="space-y-4 pt-4">
               {openings.map((opening) => (
-                <div key={opening.title} className="rounded-xl border border-border/60 bg-white/70 p-4 shadow-card/30">
+                <div key={opening.title} className="rounded-xl border border-border/60 bg-card/80 p-4 shadow-card/30">
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="text-sm font-semibold text-foreground">{opening.title}</p>

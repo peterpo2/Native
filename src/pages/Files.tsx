@@ -100,7 +100,7 @@ const Files = () => {
               {folders.map((folder) => (
                 <div
                   key={folder.path}
-                  className={`flex items-start justify-between rounded-xl border border-border/60 bg-white/70 p-4 shadow-card/30 transition-all ${highlightedFolder === folder.name ? "ring-2 ring-accent/60" : ""}`}
+                  className={`flex items-start justify-between rounded-xl border border-border/60 bg-card/80 p-4 shadow-card/30 transition-all ${highlightedFolder === folder.name ? "ring-2 ring-accent/60" : ""}`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-accent text-white">

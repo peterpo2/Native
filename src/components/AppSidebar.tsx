@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Target,
@@ -29,6 +29,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/lib/utils";
 
 const workspaceNavItems = [
   { title: "Home", url: "/", icon: LayoutDashboard },
@@ -65,20 +66,26 @@ export function AppSidebar() {
       : "hover:bg-sidebar-accent/50 text-sidebar-foreground";
 
   return (
-    <Sidebar className={`${collapsed ? "w-16" : "w-64"} border-r shadow-card transition-all duration-300`}>
-      <SidebarHeader className="p-4 border-b">
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border/60 shadow-card">
+      <SidebarHeader className="p-4 border-b border-sidebar-border/60">
         <div className="flex items-center justify-between">
-          {!collapsed && (
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center text-lg font-bold text-white">
-                N
-              </div>
-              <div>
+          <Link
+            to="/"
+            className={cn(
+              "group flex w-full items-center rounded-lg px-2 transition-colors hover:bg-sidebar-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+              collapsed ? "justify-center" : "gap-3"
+            )}
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary text-lg font-bold text-white shadow-sm transition-transform group-hover:scale-105">
+              N
+            </div>
+            {!collapsed && (
+              <div className="text-left">
                 <h2 className="font-semibold text-sidebar-foreground">Native CRM</h2>
                 <p className="text-xs text-sidebar-foreground/60">Workspace</p>
               </div>
-            </div>
-          )}
+            )}
+          </Link>
           <Button
             variant="ghost"
             size="sm"
@@ -88,7 +95,7 @@ export function AppSidebar() {
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
         </div>
-        
+
         {!collapsed && (
           <div className="mt-4 space-y-2">
             <Button

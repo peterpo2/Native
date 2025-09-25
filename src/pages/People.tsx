@@ -98,7 +98,7 @@ const People = () => {
             </CardHeader>
             <CardContent className="space-y-4 pt-4">
               {team.map((member) => (
-                <div key={member.email} className="flex flex-col gap-3 rounded-xl border border-border/60 bg-white/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div key={member.email} className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card/80 p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={member.avatar ?? undefined} alt={member.name} />
