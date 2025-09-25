@@ -45,5 +45,46 @@ public static class ApplicationBuilderExtensions
                 await roleManager.CreateAsync(new IdentityRole<Guid>(role));
             }
         }
+
+        var userManager = services.GetRequiredService<UserManager<User>>();
+        var seededUsers = new (string Email, string FullName, string Role, string Password)[]
+        {
+            ("admin@native.local", "Native Admin", "Admin", "Native!123"),
+            ("manager@native.local", "Native Manager", "Manager", "Native!123"),
+            ("user@native.local", "Native User", "User", "Native!123")
+        };
+
+        foreach (var (email, fullName, role, password) in seededUsers)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user is null)
+            {
+                user = new User
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = fullName,
+                    Role = role,
+                    EmailConfirmed = true
+                };
+
+                var createResult = await userManager.CreateAsync(user, password);
+                if (!createResult.Succeeded)
+                {
+                    var errorDescriptions = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                    throw new InvalidOperationException($"Failed to create seeded user '{email}': {errorDescriptions}");
+                }
+            }
+            else if (user.Role != role)
+            {
+                user.Role = role;
+                await userManager.UpdateAsync(user);
+            }
+
+            if (!await userManager.IsInRoleAsync(user, role))
+            {
+                await userManager.AddToRoleAsync(user, role);
+            }
+        }
     }
 }
