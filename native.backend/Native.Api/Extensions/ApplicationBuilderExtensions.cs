@@ -21,7 +21,7 @@ public static class ApplicationBuilderExtensions
         var context = services.GetRequiredService<NativeDbContext>();
         if (context.Database.IsRelational())
         {
-             var migrations = context.Database.GetMigrations();
+            var migrations = context.Database.GetMigrations();
             if (migrations.Any())
             {
                 await context.Database.MigrateAsync(cancellationToken);
