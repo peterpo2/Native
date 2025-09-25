@@ -59,7 +59,8 @@ export function AppSidebar() {
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "group relative flex h-full w-full items-center rounded-xl border border-transparent transition-all duration-300",
+      "group relative flex w-full items-center rounded-xl border border-transparent transition-all duration-300",
+      "min-h-[3.25rem]",
       collapsed ? "justify-center p-0" : "px-3 py-2",
       isActive
         ? "bg-gradient-to-br from-primary/30 via-primary/15 to-primary/5 text-sidebar-primary shadow-[0_18px_40px_-28px_rgba(56,189,248,0.9)] border-primary/40"
@@ -145,7 +146,13 @@ export function AppSidebar() {
                         title={collapsed ? item.title : undefined}
                         className={({ isActive }) => getNavCls({ isActive })}
                       >
-                        <item.icon className={cn("h-6 w-6 flex-shrink-0", collapsed && "mx-auto")} />
+                        <item.icon
+                          className={cn(
+                            "flex-shrink-0 transition-transform",
+                            collapsed ? "h-8 w-8" : "h-6 w-6",
+                            collapsed && "mx-auto",
+                          )}
+                        />
                         {!collapsed && <span className="ml-3 flex-1">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
@@ -207,7 +214,13 @@ export function AppSidebar() {
                         title={collapsed ? item.title : undefined}
                         className={({ isActive }) => getNavCls({ isActive })}
                       >
-                        <item.icon className={cn("h-6 w-6 flex-shrink-0", collapsed && "mx-auto")} />
+                        <item.icon
+                          className={cn(
+                            "flex-shrink-0 transition-transform",
+                            collapsed ? "h-8 w-8" : "h-6 w-6",
+                            collapsed && "mx-auto",
+                          )}
+                        />
                         {!collapsed && <span className="ml-3">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
