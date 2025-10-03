@@ -150,6 +150,7 @@ public class UsersController : ControllerBase
 
         var user = new User
         {
+            Id = Guid.NewGuid(),
             UserName = request.Email,
             Email = request.Email,
             FullName = request.FullName,

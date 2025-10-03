@@ -30,6 +30,9 @@ public static class ApplicationBuilderExtensions
             {
                 await context.Database.EnsureCreatedAsync(cancellationToken);
             }
+
+            await EnsureSoftDeleteColumnsAsync(context, cancellationToken);
+            await EnsureSoftDeleteIndexesAsync(context, cancellationToken);
         }
         else
         {
@@ -86,5 +89,71 @@ public static class ApplicationBuilderExtensions
                 await userManager.AddToRoleAsync(user, role);
             }
         }
+    }
+
+    private static async Task EnsureSoftDeleteColumnsAsync(NativeDbContext context, CancellationToken cancellationToken)
+    {
+        if (!context.Database.IsSqlServer())
+        {
+            return;
+        }
+
+        var tables = new[]
+        {
+            "AspNetUsers",
+            "Calendars",
+            "CalendarEvents",
+            "CalendarShares",
+            "IntegrationConnections",
+            "JobApplications",
+            "JobOpenings",
+            "Organizations",
+            "Projects",
+            "TaskAttachments",
+            "Tasks"
+        };
+
+        foreach (var table in tables)
+        {
+            var sql = $@"
+IF COL_LENGTH('{table}', 'IsDeleted') IS NULL
+BEGIN
+    ALTER TABLE {table} ADD IsDeleted bit NOT NULL CONSTRAINT DF_{table}_IsDeleted DEFAULT(0) WITH VALUES;
+END";
+
+            await context.Database.ExecuteSqlRawAsync(sql, cancellationToken);
+        }
+    }
+
+    private static async Task EnsureSoftDeleteIndexesAsync(NativeDbContext context, CancellationToken cancellationToken)
+    {
+        if (!context.Database.IsSqlServer())
+        {
+            return;
+        }
+
+        const string dropOldIntegrationIndex = @"
+IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_IntegrationConnections_Provider_UserId')
+BEGIN
+    DROP INDEX IX_IntegrationConnections_Provider_UserId ON IntegrationConnections;
+END";
+
+        const string createIntegrationIndex = @"
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_IntegrationConnections_Provider_UserId_IsDeleted')
+BEGIN
+    CREATE UNIQUE INDEX IX_IntegrationConnections_Provider_UserId_IsDeleted
+        ON IntegrationConnections (Provider, UserId, IsDeleted);
+END";
+
+        const string createUserEmailIndex = @"
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_AspNetUsers_Email_IsDeleted')
+BEGIN
+    CREATE UNIQUE INDEX IX_AspNetUsers_Email_IsDeleted
+        ON AspNetUsers (Email, IsDeleted);
+END";
+
+        await context.Database.ExecuteSqlRawAsync(dropOldIntegrationIndex, cancellationToken);
+        await context.Database.ExecuteSqlRawAsync(createIntegrationIndex, cancellationToken);
+        await context.Database.ExecuteSqlRawAsync(createUserEmailIndex, cancellationToken);
     }
 }
