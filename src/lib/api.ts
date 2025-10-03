@@ -1,8 +1,21 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL ??
-  (typeof window !== "undefined" && window.location.hostname !== "localhost"
-    ? window.location.origin
-    : "https://localhost:5001");
+const API_BASE_URL = (() => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  const host = window.location.hostname;
+  const isLocalHost =
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "0.0.0.0" ||
+    host.endsWith(".localhost");
+
+  return isLocalHost ? "https://localhost:5001" : window.location.origin;
+})();
 
 async function request<T>(
   path: string,
