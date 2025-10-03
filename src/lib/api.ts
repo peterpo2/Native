@@ -4,7 +4,7 @@ interface ErrorWithStatus extends Error {
 
 const normalizeBaseUrl = (value: string) => value.replace(/\/+$/, "");
 
-const API_BASE_URLS: string[] = (() => {
+const resolveApiBaseUrls = (): string[] => {
   const urls: string[] = [];
   const seen = new Set<string>();
 
@@ -29,8 +29,23 @@ const API_BASE_URLS: string[] = (() => {
 
   addUrl(import.meta.env.VITE_API_URL);
 
-  if (typeof window !== "undefined") {
-    const { hostname, origin, protocol, port } = window.location;
+  const globalLocation = (() => {
+    if (typeof window !== "undefined" && typeof window.location !== "undefined") {
+      return window.location;
+    }
+
+    if (typeof globalThis !== "undefined" && "location" in globalThis) {
+      const candidate = (globalThis as { location?: Location }).location;
+      if (candidate) {
+        return candidate;
+      }
+    }
+
+    return null;
+  })();
+
+  if (globalLocation) {
+    const { hostname, origin, protocol, port } = globalLocation;
     const isLocalHost =
       hostname === "localhost" ||
       hostname === "127.0.0.1" ||
@@ -70,7 +85,9 @@ const API_BASE_URLS: string[] = (() => {
   addUrl("");
 
   return urls;
-})();
+};
+
+const API_BASE_URLS: string[] = resolveApiBaseUrls();
 
 async function request<T>(
   path: string,
