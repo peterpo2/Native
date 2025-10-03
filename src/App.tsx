@@ -18,8 +18,10 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Goals from "./pages/Goals";
 import TimeOff from "./pages/TimeOff";
+import AdminActivity from "./pages/AdminActivity";
 import { AuthProvider } from "./context/AuthContext";
 import { RequireAuth } from "./components/RequireAuth";
+import { RequireAdmin } from "./components/RequireAdmin";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,9 @@ const App = () => (
               <Route path="/dashboards" element={<Dashboards />} />
               <Route path="/goals" element={<Goals />} />
               <Route path="/time-off" element={<TimeOff />} />
+              <Route element={<RequireAdmin />}>
+                <Route path="/admin/activity" element={<AdminActivity />} />
+              </Route>
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
