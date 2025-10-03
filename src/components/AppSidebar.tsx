@@ -12,8 +12,6 @@ import {
   Layout,
   FileText,
   CalendarClock,
-  ShieldCheck,
-  Users,
 } from "lucide-react";
 
 import {
@@ -53,11 +51,6 @@ const resourcesNavItems = [
   { title: "Dashboards", url: "/dashboards", icon: Layout },
   { title: "Docs", url: "/files", icon: FileText },
   { title: "Settings", url: "/settings", icon: Settings },
-];
-
-const adminNavItems = [
-  { title: "Admin activity", url: "/admin/activity", icon: ShieldCheck },
-  { title: "Users", url: "/admin/users", icon: Users },
 ];
 
 export function AppSidebar() {
@@ -238,38 +231,6 @@ export function AppSidebar() {
               </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {user?.role?.toLowerCase() === "admin" && (
-          <SidebarGroup className="mt-6">
-            <SidebarGroupLabel className={collapsed ? "sr-only" : "uppercase tracking-wide text-xs text-muted-foreground"}>
-              Admin
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className={cn("space-y-1", collapsed && "space-y-0 gap-3")}>
-                {adminNavItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to={item.url}
-                        title={collapsed ? item.title : undefined}
-                        className={({ isActive }) => getNavCls({ isActive })}
-                      >
-                        <item.icon
-                          className={cn(
-                            "flex-shrink-0 transition-transform",
-                            collapsed ? "h-8 w-8" : "h-6 w-6",
-                            collapsed && "mx-auto",
-                          )}
-                        />
-                        {!collapsed && <span className="ml-3">{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
 
         <div
           className={cn(

@@ -26,10 +26,12 @@ public class UsersController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    public IActionResult GetUsers()
+    public async Task<IActionResult> GetUsers()
     {
-        var users = _userManager.Users
+        var users = await _userManager.Users
+            .AsNoTracking()
             .Where(u => !u.IsDeleted)
+            .OrderByDescending(u => u.CreatedAt)
             .Select(u => new
             {
                 u.Id,
@@ -40,7 +42,8 @@ public class UsersController : ControllerBase
                 u.IsTwoFactorEnabled,
                 u.CreatedAt
             })
-            .OrderByDescending(u => u.CreatedAt);
+            .ToListAsync();
+
         return Ok(users);
     }
 

@@ -89,13 +89,13 @@ const Settings = () => {
                 <div>
                   <CardTitle className="text-lg font-semibold text-foreground">Administrator tools</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Access the workspace activity monitor to review every movement across the organization.
+                    Launch the control center to manage workspace members and review high-signal activity in one place.
                   </p>
                 </div>
               </CardHeader>
               <CardFooter className="flex justify-end">
                 <Button asChild className="bg-gradient-primary text-white shadow-glow">
-                  <Link to="/admin/activity">Open admin panel</Link>
+                  <Link to="/admin">Open admin panel</Link>
                 </Button>
               </CardFooter>
             </Card>

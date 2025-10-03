@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -208,28 +209,35 @@ const AdminUsers = () => {
           title="User management"
           description="Create, update, or deactivate workspace members. Only administrators can see this area."
           actions={(
-            <Dialog open={isCreateOpen} onOpenChange={(open) => {
-              setCreateOpen(open);
-              if (!open) {
-                createForm.reset(defaultCreateValues);
-              }
-            }}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="gap-2 bg-gradient-primary text-white shadow-glow">
-                  <UserPlus className="h-4 w-4" />
-                  New user
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create user</DialogTitle>
-                  <DialogDescription>Invite a new teammate with the appropriate role.</DialogDescription>
-                </DialogHeader>
-                <Form {...createForm}>
-                  <form
-                    onSubmit={createForm.handleSubmit((values) => createMutation.mutate(values))}
-                    className="space-y-4"
-                  >
+            <>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/admin">Admin panel</Link>
+              </Button>
+              <Dialog
+                open={isCreateOpen}
+                onOpenChange={(open) => {
+                  setCreateOpen(open);
+                  if (!open) {
+                    createForm.reset(defaultCreateValues);
+                  }
+                }}
+              >
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-2 bg-gradient-primary text-white shadow-glow">
+                    <UserPlus className="h-4 w-4" />
+                    New user
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create user</DialogTitle>
+                    <DialogDescription>Invite a new teammate with the appropriate role.</DialogDescription>
+                  </DialogHeader>
+                  <Form {...createForm}>
+                    <form
+                      onSubmit={createForm.handleSubmit((values) => createMutation.mutate(values))}
+                      className="space-y-4"
+                    >
                     <FormField
                       control={createForm.control}
                       name="fullName"
@@ -315,10 +323,11 @@ const AdminUsers = () => {
                         Create user
                       </Button>
                     </DialogFooter>
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
+            </>
           )}
         />
 
