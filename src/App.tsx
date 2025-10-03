@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Goals from "./pages/Goals";
+import TimeOff from "./pages/TimeOff";
 import { AuthProvider } from "./context/AuthContext";
 import { RequireAuth } from "./components/RequireAuth";
 
@@ -44,6 +45,7 @@ const App = () => (
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/demo" element={<Demo />} />
               <Route path="/goals" element={<Goals />} />
+              <Route path="/time-off" element={<TimeOff />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
