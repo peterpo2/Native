@@ -1,27 +1,75 @@
-const API_BASE_URLS = (() => {
-  if (import.meta.env.VITE_API_URL) {
-    return [import.meta.env.VITE_API_URL];
+interface ErrorWithStatus extends Error {
+  status?: number;
+}
+
+const normalizeBaseUrl = (value: string) => value.replace(/\/+$/, "");
+
+const API_BASE_URLS: string[] = (() => {
+  const urls: string[] = [];
+  const seen = new Set<string>();
+
+  const addUrl = (value?: string | null) => {
+    if (typeof value !== "string") return;
+    const trimmed = value.trim();
+
+    if (trimmed.length === 0) {
+      if (!seen.has("")) {
+        seen.add("");
+        urls.push("");
+      }
+      return;
+    }
+
+    const normalized = normalizeBaseUrl(trimmed);
+    if (seen.has(normalized)) return;
+
+    seen.add(normalized);
+    urls.push(normalized);
+  };
+
+  addUrl(import.meta.env.VITE_API_URL);
+
+  if (typeof window !== "undefined") {
+    const { hostname, origin, protocol, port } = window.location;
+    const isLocalHost =
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0" ||
+      hostname.endsWith(".localhost");
+
+    if (isLocalHost) {
+      const httpsPorts = new Set<number>([5001, 443]);
+      const httpPorts = new Set<number>([5000, 80]);
+      const numericPort = Number.parseInt(port ?? "", 10);
+
+      if (!Number.isNaN(numericPort)) {
+        if (protocol === "https:") {
+          httpsPorts.add(numericPort);
+          if (numericPort >= 7000) {
+            httpPorts.add(numericPort - 2000);
+          }
+        } else if (protocol === "http:") {
+          httpPorts.add(numericPort);
+          if (numericPort >= 5000) {
+            httpsPorts.add(numericPort + 2000);
+          }
+        }
+      }
+
+      httpsPorts.forEach((httpsPort) => addUrl(`https://${hostname}:${httpsPort}`));
+      httpPorts.forEach((httpPort) => addUrl(`http://${hostname}:${httpPort}`));
+    } else {
+      addUrl(origin);
+    }
+
+    // Always include same-origin as a fallback for reverse proxies or unified deployments.
+    addUrl(origin);
   }
 
-  if (typeof window === "undefined") {
-    return [""];
-  }
+  // Final fallback to same-origin relative requests (supports custom dev proxies).
+  addUrl("");
 
-  const host = window.location.hostname;
-  const isLocalHost =
-    host === "localhost" ||
-    host === "127.0.0.1" ||
-    host === "0.0.0.0" ||
-    host.endsWith(".localhost");
-
-  if (!isLocalHost) {
-    return [window.location.origin];
-  }
-
-  const secureOrigin = `https://${host}:5001`;
-  const insecureOrigin = `http://${host}:5000`;
-
-  return [secureOrigin, insecureOrigin];
+  return urls;
 })();
 
 async function request<T>(
@@ -36,14 +84,15 @@ async function request<T>(
     headers.set("Authorization", `Bearer ${options.token}`);
   }
 
-  let lastError: unknown;
+  let lastError: Error | null = null;
 
   for (let index = 0; index < API_BASE_URLS.length; index += 1) {
     const baseUrl = API_BASE_URLS[index];
     const isLastAttempt = index === API_BASE_URLS.length - 1;
+    const url = baseUrl ? `${baseUrl}${path}` : path;
 
     try {
-      const response = await fetch(`${baseUrl}${path}`, {
+      const response = await fetch(url, {
         ...options,
         headers,
       });
@@ -57,21 +106,37 @@ async function request<T>(
       const payload = isJson ? await response.json() : await response.text();
 
       if (!response.ok) {
-        const message = typeof payload === "string" ? payload : payload?.message ?? "Request failed";
-        throw new Error(message);
+        const message =
+          typeof payload === "string"
+            ? payload || response.statusText || "Request failed"
+            : payload?.message ?? response.statusText ?? "Request failed";
+
+        const error: ErrorWithStatus = new Error(message);
+        error.status = response.status;
+        lastError = error;
+
+        if (response.status === 404 && !isLastAttempt) {
+          continue;
+        }
+
+        throw error;
       }
 
       return payload as T;
     } catch (error) {
       const isNetworkError = error instanceof TypeError;
-      if (!isNetworkError || isLastAttempt) {
-        throw error;
+      const status = (error as ErrorWithStatus)?.status;
+
+      if ((status === 404 || isNetworkError) && !isLastAttempt) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        continue;
       }
-      lastError = error;
+
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 
-  throw lastError instanceof Error ? lastError : new Error("Request failed");
+  throw lastError ?? new Error("Request failed");
 }
 
 export interface LoginPayload {
