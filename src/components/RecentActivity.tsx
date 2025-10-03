@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 
 const activities = [
   {
-    id: 1,
+    id: "f6f7b24f-37d1-4f6a-9061-bb30acb6b1fb",
     user: { name: "Sarah Johnson", initials: "SJ", avatar: null },
     action: "completed task",
     target: "Update user dashboard",
@@ -13,7 +13,7 @@ const activities = [
     type: "task"
   },
   {
-    id: 2,
+    id: "79f14c6e-007f-4a6b-9e46-44d0a8e4871a",
     user: { name: "Mike Chen", initials: "MC", avatar: null },
     action: "added contact",
     target: "Acme Corp - John Smith",
@@ -21,7 +21,7 @@ const activities = [
     type: "contact"
   },
   {
-    id: 3,
+    id: "6d1f5b63-1826-4d0a-9d75-6cb37992f39a",
     user: { name: "Emma Davis", initials: "ED", avatar: null },
     action: "scheduled meeting",
     target: "Q4 Review Call",
@@ -29,7 +29,7 @@ const activities = [
     type: "meeting"
   },
   {
-    id: 4,
+    id: "a3a157bc-1e4f-4c0c-9b4b-0245df1c7f28",
     user: { name: "Alex Wilson", initials: "AW", avatar: null },
     action: "uploaded file",
     target: "Project_Specs.pdf",
@@ -37,7 +37,7 @@ const activities = [
     type: "file"
   },
   {
-    id: 5,
+    id: "0e37f907-9e1b-4a42-a238-1934dca90812",
     user: { name: "Lisa Brown", initials: "LB", avatar: null },
     action: "created document",
     target: "Marketing Strategy 2024",

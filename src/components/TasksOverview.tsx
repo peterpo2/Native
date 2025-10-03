@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const recentTasks = [
   {
-    id: 1,
+    id: "b9cc2e3e-0cc3-4fdd-9c33-d5f3b0b322d8",
     title: "Update CRM dashboard design",
     priority: "High",
     assignee: { name: "Sarah Johnson", avatar: null, initials: "SJ" },
@@ -13,7 +13,7 @@ const recentTasks = [
     status: "In Progress"
   },
   {
-    id: 2,
+    id: "3a9b644d-934f-48c0-92db-3c841ae04fd7",
     title: "Integrate Dropbox API",
     priority: "Medium",
     assignee: { name: "Mike Chen", avatar: null, initials: "MC" },
@@ -21,7 +21,7 @@ const recentTasks = [
     status: "Todo"
   },
   {
-    id: 3,
+    id: "2c7f56fe-f01f-4ab6-a1d5-796769a49316",
     title: "Review job applications",
     priority: "Low",
     assignee: { name: "Emma Davis", avatar: null, initials: "ED" },

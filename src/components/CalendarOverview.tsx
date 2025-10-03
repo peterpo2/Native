@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 
 const upcomingEvents = [
   {
-    id: 1,
+    id: "d058c1c9-1439-4f7d-8be6-1cf3d3a62b7b",
     title: "Team Standup",
     time: "9:00 AM",
     type: "meeting",
@@ -12,7 +12,7 @@ const upcomingEvents = [
     attendees: 8
   },
   {
-    id: 2,
+    id: "4a6ca34d-8e21-4d4e-b610-0a5bc6da1233",
     title: "Client Review Call",
     time: "2:00 PM",
     type: "call",
@@ -20,7 +20,7 @@ const upcomingEvents = [
     attendees: 4
   },
   {
-    id: 3,
+    id: "0d1b9849-2f1d-4fbe-8228-77b9e6a91e76",
     title: "Project Deadline",
     time: "EOD",
     type: "deadline",
