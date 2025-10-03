@@ -19,7 +19,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { CalendarDays, Download, Plus, Users } from "lucide-react";
 import { addDays, eachDayOfInterval, format, isFuture, parseISO } from "date-fns";
-import { bg } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 interface LeaveRequest {
   id: number;
@@ -27,7 +27,7 @@ interface LeaveRequest {
   type: string;
   start: Date;
   end: Date;
-  status: "Очаква потвърждение" | "Одобрена" | "Отказана";
+  status: "Pending" | "Approved" | "Declined";
   note?: string;
 }
 
@@ -44,81 +44,81 @@ interface ScheduleEntry {
 const initialLeaveRequests: LeaveRequest[] = [
   {
     id: 1,
-    employee: "Мария Петрова",
-    type: "Платен отпуск",
+    employee: "Maria Petrova",
+    type: "Paid time off",
     start: parseISO("2024-07-02"),
     end: parseISO("2024-07-05"),
-    status: "Одобрена",
-    note: "Семейно пътуване, екипът е уведомен.",
+    status: "Approved",
+    note: "Family trip, handover completed with the team.",
   },
   {
     id: 2,
-    employee: "Иван Димитров",
-    type: "Неплатен отпуск",
+    employee: "Ivan Dimitrov",
+    type: "Unpaid leave",
     start: parseISO("2024-07-18"),
     end: parseISO("2024-07-19"),
-    status: "Очаква потвърждение",
-    note: "Очаква финален одобряващ.",
+    status: "Pending",
+    note: "Waiting for final approver.",
   },
   {
     id: 3,
-    employee: "Елена Георгиева",
-    type: "Работа от разстояние",
+    employee: "Elena Georgieva",
+    type: "Remote work",
     start: parseISO("2024-06-24"),
     end: parseISO("2024-06-26"),
-    status: "Одобрена",
+    status: "Approved",
   },
   {
     id: 4,
-    employee: "Николай Иванов",
-    type: "Болничен",
+    employee: "Nikolay Ivanov",
+    type: "Sick leave",
     start: parseISO("2024-06-14"),
     end: parseISO("2024-06-16"),
-    status: "Отказана",
-    note: "Не е предоставен болничен лист.",
+    status: "Declined",
+    note: "Medical certificate pending.",
   },
 ];
 
 const initialSchedule: ScheduleEntry[] = [
   {
     id: 1,
-    employee: "Екип Продажби",
+    employee: "Sales team",
     date: parseISO("2024-06-17"),
     start: "09:30",
     end: "18:00",
-    location: "Офис София",
-    notes: "Покрити всички клиентски линии.",
+    location: "Sofia HQ",
+    notes: "All customer lines covered.",
   },
   {
     id: 2,
-    employee: "Поддръжка",
+    employee: "Support",
     date: parseISO("2024-06-18"),
     start: "08:00",
     end: "16:30",
-    location: "Смесен режим",
-    notes: "Двама души работят дистанционно.",
+    location: "Hybrid",
+    notes: "Two agents working remotely.",
   },
   {
     id: 3,
-    employee: "Маркетинг",
+    employee: "Marketing",
     date: parseISO("2024-06-19"),
     start: "10:00",
     end: "17:30",
-    location: "Офис Пловдив",
+    location: "Plovdiv office",
   },
 ];
 
 const statusVariants: Record<LeaveRequest["status"], "secondary" | "default" | "destructive"> = {
-  "Одобрена": "secondary",
-  "Очаква потвърждение": "default",
-  "Отказана": "destructive",
+  Approved: "secondary",
+  Pending: "default",
+  Declined: "destructive",
 };
 
 const formatDateRange = (start: Date, end: Date) => {
-  const sameMonth = format(start, "MMMM", { locale: bg }) === format(end, "MMMM", { locale: bg });
+  const sameMonth = format(start, "MMMM", { locale: enUS }) === format(end, "MMMM", { locale: enUS });
   const monthFormat = sameMonth ? "d" : "d MMM";
 
-  return `${format(start, `${monthFormat}`, { locale: bg })} – ${format(end, "d MMM", { locale: bg })}`;
+  return `${format(start, `${monthFormat}`, { locale: enUS })} – ${format(end, "d MMM", { locale: enUS })}`;
 };
 
 const TimeOff = () => {
@@ -130,7 +130,7 @@ const TimeOff = () => {
     date: format(new Date(), "yyyy-MM-dd"),
     start: "09:00",
     end: "17:30",
-    location: "Офис София",
+    location: "Sofia HQ",
     notes: "",
   });
 
@@ -145,9 +145,9 @@ const TimeOff = () => {
 
   const modifiers = useMemo(
     () => ({
-      approved: calendarDays.filter((entry) => entry.status === "Одобрена").map((entry) => entry.day),
-      pending: calendarDays.filter((entry) => entry.status === "Очаква потвърждение").map((entry) => entry.day),
-      rejected: calendarDays.filter((entry) => entry.status === "Отказана").map((entry) => entry.day),
+      approved: calendarDays.filter((entry) => entry.status === "Approved").map((entry) => entry.day),
+      pending: calendarDays.filter((entry) => entry.status === "Pending").map((entry) => entry.day),
+      rejected: calendarDays.filter((entry) => entry.status === "Declined").map((entry) => entry.day),
     }),
     [calendarDays],
   );
@@ -159,8 +159,8 @@ const TimeOff = () => {
 
     if (Number.isNaN(parsedDate.getTime())) {
       toast({
-        title: "Невалидна дата",
-        description: "Моля, въведете коректна дата за графика.",
+        title: "Invalid date",
+        description: "Enter a valid date for the schedule entry.",
         variant: "destructive",
       });
       return;
@@ -168,7 +168,7 @@ const TimeOff = () => {
 
     const newEntry: ScheduleEntry = {
       id: Date.now(),
-      employee: formState.employee || "Неразпределен екип",
+      employee: formState.employee || "Unassigned team",
       date: parsedDate,
       start: formState.start,
       end: formState.end,
@@ -180,24 +180,24 @@ const TimeOff = () => {
     setFormState((prev) => ({ ...prev, employee: "", notes: "" }));
 
     toast({
-      title: "Графикът е обновен",
-      description: `${newEntry.employee} е добавен за ${format(newEntry.date, "d MMMM", { locale: bg })}.`,
+      title: "Schedule updated",
+      description: `${newEntry.employee} was scheduled for ${format(newEntry.date, "d MMMM", { locale: enUS })}.`,
     });
   };
 
   const handleExport = () => {
     toast({
-      title: "Експорт в процес",
-      description: "Създава се PDF с отпуски и график.",
+      title: "Export in progress",
+      description: "Generating a PDF with time-off and schedule details.",
     });
   };
 
   const summary = useMemo(() => {
-    const approved = leaveRequests.filter((request) => request.status === "Одобрена").length;
-    const pending = leaveRequests.filter((request) => request.status === "Очаква потвърждение").length;
-    const rejected = leaveRequests.filter((request) => request.status === "Отказана").length;
+    const approved = leaveRequests.filter((request) => request.status === "Approved").length;
+    const pending = leaveRequests.filter((request) => request.status === "Pending").length;
+    const rejected = leaveRequests.filter((request) => request.status === "Declined").length;
     const nextRequest = leaveRequests
-      .filter((request) => request.status === "Одобрена" && isFuture(addDays(request.start, -1)))
+      .filter((request) => request.status === "Approved" && isFuture(addDays(request.start, -1)))
       .sort((a, b) => a.start.getTime() - b.start.getTime())[0];
 
     return {
@@ -217,17 +217,17 @@ const TimeOff = () => {
     <DashboardLayout>
       <div className="flex min-h-screen flex-col bg-gradient-subtle">
         <PageHeader
-          title="Отпуски и работно време"
-          description="Следете заявките за отпуск, разпределяйте смени и планирайте заетостта на екипа."
+          title="Time off & scheduling"
+          description="Track leave requests, coordinate shift coverage, and plan team availability."
           actions={(
             <>
               <Button variant="outline" size="sm" onClick={handleExport}>
                 <Download className="mr-2 h-4 w-4" />
-                Експортирай
+                Export
               </Button>
               <Button size="sm" className="bg-gradient-primary text-white shadow-glow">
                 <Plus className="mr-2 h-4 w-4" />
-                Нова заявка
+                New request
               </Button>
             </>
           )}
@@ -239,7 +239,7 @@ const TimeOff = () => {
               <CardHeader className="border-b border-border/60 pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
                   <CalendarDays className="h-5 w-5 text-primary" />
-                  Календар на отсъствията
+                  Time-off calendar
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid gap-6 lg:grid-cols-[1.4fr,1fr]">
@@ -256,26 +256,26 @@ const TimeOff = () => {
                 />
                 <div className="space-y-4">
                   <div className="rounded-xl border border-border/60 bg-card/80 p-4">
-                    <h3 className="text-sm font-semibold text-foreground">Статус на отпуските</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Leave status</h3>
                     <div className="mt-3 space-y-2 text-sm">
                       <div className="flex items-center justify-between">
                         <span className="flex items-center gap-2">
                           <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" aria-hidden="true" />
-                          Одобрени
+                          Approved
                         </span>
                         <span className="font-semibold">{summary.approved}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="flex items-center gap-2">
                           <span className="h-2.5 w-2.5 rounded-full bg-amber-500" aria-hidden="true" />
-                          Чакат потвърждение
+                          Pending approval
                         </span>
                         <span className="font-semibold">{summary.pending}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="flex items-center gap-2">
                           <span className="h-2.5 w-2.5 rounded-full bg-rose-500" aria-hidden="true" />
-                          Отказани
+                          Declined
                         </span>
                         <span className="font-semibold">{summary.rejected}</span>
                       </div>
@@ -283,7 +283,7 @@ const TimeOff = () => {
                   </div>
 
                   <div className="rounded-xl border border-border/60 bg-card/80 p-4">
-                    <h3 className="text-sm font-semibold text-foreground">Следващ одобрен отпуск</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Next approved leave</h3>
                     {summary.nextRequest ? (
                       <div className="mt-3 space-y-1 text-sm">
                         <p className="font-medium text-foreground">{summary.nextRequest.employee}</p>
@@ -292,19 +292,19 @@ const TimeOff = () => {
                         </p>
                       </div>
                     ) : (
-                      <p className="mt-3 text-sm text-muted-foreground">Няма предстоящи одобрени отсъствия.</p>
+                      <p className="mt-3 text-sm text-muted-foreground">No upcoming approved time off.</p>
                     )}
                   </div>
 
                   <div className="rounded-xl border border-border/60 bg-card/80 p-4">
-                    <h3 className="text-sm font-semibold text-foreground">Предстоящи смени</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Upcoming shifts</h3>
                     <ul className="mt-3 space-y-2 text-sm">
                       {upcomingSchedule.map((entry) => (
                         <li key={entry.id} className="flex items-start justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2">
                           <div>
                             <p className="font-medium text-foreground">{entry.employee}</p>
                             <p className="text-muted-foreground">
-                              {format(entry.date, "d MMMM", { locale: bg })} · {entry.start} – {entry.end}
+                              {format(entry.date, "d MMMM", { locale: enUS })} · {entry.start} – {entry.end}
                             </p>
                           </div>
                           <Badge variant="secondary" className="whitespace-nowrap">
@@ -322,23 +322,23 @@ const TimeOff = () => {
               <CardHeader className="border-b border-border/60 pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
                   <Users className="h-5 w-5 text-primary" />
-                  График по екипи
+                  Team schedule
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <form className="grid gap-4 rounded-xl border border-border/60 bg-card/80 p-4 md:grid-cols-2" onSubmit={handleAddShift}>
                   <div className="md:col-span-1">
-                    <Label htmlFor="employee">Екип / служител</Label>
+                    <Label htmlFor="employee">Team / employee</Label>
                     <Input
                       id="employee"
-                      placeholder="Пр. Екип Продажби"
+                      placeholder="e.g. Sales team"
                       value={formState.employee}
                       onChange={(event) => setFormState((prev) => ({ ...prev, employee: event.target.value }))}
                       className="mt-1"
                     />
                   </div>
                   <div className="md:col-span-1">
-                    <Label htmlFor="date">Дата</Label>
+                    <Label htmlFor="date">Date</Label>
                     <Input
                       id="date"
                       type="date"
@@ -349,7 +349,7 @@ const TimeOff = () => {
                   </div>
                   <div className="flex gap-3">
                     <div className="flex-1">
-                      <Label htmlFor="start">От</Label>
+                      <Label htmlFor="start">Start</Label>
                       <Input
                         id="start"
                         type="time"
@@ -359,7 +359,7 @@ const TimeOff = () => {
                       />
                     </div>
                     <div className="flex-1">
-                      <Label htmlFor="end">До</Label>
+                      <Label htmlFor="end">End</Label>
                       <Input
                         id="end"
                         type="time"
@@ -370,20 +370,20 @@ const TimeOff = () => {
                     </div>
                   </div>
                   <div className="md:col-span-1">
-                    <Label htmlFor="location">Локация</Label>
+                    <Label htmlFor="location">Location</Label>
                     <Input
                       id="location"
-                      placeholder="Офис, дистанционно..."
+                      placeholder="Office, remote..."
                       value={formState.location}
                       onChange={(event) => setFormState((prev) => ({ ...prev, location: event.target.value }))}
                       className="mt-1"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Label htmlFor="notes">Бележки</Label>
+                    <Label htmlFor="notes">Notes</Label>
                     <Textarea
                       id="notes"
-                      placeholder="Допълнителни указания за екипа"
+                      placeholder="Additional context for the team"
                       value={formState.notes}
                       onChange={(event) => setFormState((prev) => ({ ...prev, notes: event.target.value }))}
                       className="mt-1"
@@ -393,7 +393,7 @@ const TimeOff = () => {
                   <div className="md:col-span-2 flex items-center justify-end">
                     <Button type="submit" size="sm" className="bg-gradient-primary text-white shadow-glow">
                       <Plus className="mr-2 h-4 w-4" />
-                      Добави към графика
+                      Add to schedule
                     </Button>
                   </div>
                 </form>
@@ -402,11 +402,11 @@ const TimeOff = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="hover:bg-transparent">
-                        <TableHead className="w-[22%]">Екип / служител</TableHead>
-                        <TableHead className="w-[18%]">Дата</TableHead>
-                        <TableHead className="w-[18%]">Часове</TableHead>
-                        <TableHead className="w-[18%]">Локация</TableHead>
-                        <TableHead>Бележки</TableHead>
+                        <TableHead className="w-[22%]">Team / employee</TableHead>
+                        <TableHead className="w-[18%]">Date</TableHead>
+                        <TableHead className="w-[18%]">Hours</TableHead>
+                        <TableHead className="w-[18%]">Location</TableHead>
+                        <TableHead>Notes</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -414,7 +414,7 @@ const TimeOff = () => {
                         <TableRow key={entry.id} className="border-t border-border/40">
                           <TableCell className="font-medium text-foreground">{entry.employee}</TableCell>
                           <TableCell className="text-muted-foreground">
-                            {format(entry.date, "d MMMM yyyy", { locale: bg })}
+                            {format(entry.date, "d MMMM yyyy", { locale: enUS })}
                           </TableCell>
                           <TableCell className="text-muted-foreground">
                             {entry.start} – {entry.end}
@@ -439,7 +439,7 @@ const TimeOff = () => {
           <div className="space-y-6">
             <Card className="shadow-card">
               <CardHeader className="border-b border-border/60 pb-4">
-                <CardTitle className="text-lg font-semibold text-foreground">Заявки за отпуск</CardTitle>
+                <CardTitle className="text-lg font-semibold text-foreground">Time-off requests</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {leaveRequests.map((request) => (

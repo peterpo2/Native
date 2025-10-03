@@ -36,7 +36,7 @@ const workspaceNavItems = [
   { title: "Home", url: "/", icon: LayoutDashboard },
   { title: "Notifications", url: "/notifications", icon: Bell },
   { title: "Goals", url: "/goals", icon: Target },
-  { title: "Отпуски", url: "/time-off", icon: CalendarClock },
+  { title: "Time off", url: "/time-off", icon: CalendarClock },
 ];
 
 const spaceNavItems = [
