@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -7,13 +9,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Save } from "lucide-react";
+import { Save, ShieldCheck } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useAuth } from "@/context/AuthContext";
 
 const Settings = () => {
   const { toast } = useToast();
   const { resolvedTheme, setTheme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     setIsMounted(true);
@@ -40,7 +44,7 @@ const Settings = () => {
           description="Update workspace branding and notification preferences for your team."
         />
 
-        <div className="p-6">
+        <div className="p-6 space-y-6">
           <Card className="mx-auto w-full max-w-3xl shadow-card">
             <CardHeader>
               <CardTitle className="text-lg font-semibold text-foreground">Workspace preferences</CardTitle>
@@ -76,6 +80,26 @@ const Settings = () => {
               </Button>
             </CardFooter>
           </Card>
+          {user?.role?.toLowerCase() === "admin" && (
+            <Card className="mx-auto w-full max-w-3xl border border-primary/20 bg-card/80 shadow-card">
+              <CardHeader className="flex flex-row items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-primary text-white">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg font-semibold text-foreground">Administrator tools</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Access the workspace activity monitor to review every movement across the organization.
+                  </p>
+                </div>
+              </CardHeader>
+              <CardFooter className="flex justify-end">
+                <Button asChild className="bg-gradient-primary text-white shadow-glow">
+                  <Link to="/admin/activity">Open admin panel</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
         </div>
       </div>
     </DashboardLayout>
