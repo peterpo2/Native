@@ -226,3 +226,38 @@ export const fetchUsersLookup = (token: string) =>
     method: "GET",
     token,
   });
+
+export interface DropboxStatus {
+  isConfigured: boolean;
+  isConnected: boolean;
+  authorizationUrl?: string | null;
+  state?: string | null;
+  connectedAt?: string | null;
+  accountId?: string | null;
+}
+
+export interface DropboxConnectPayload {
+  accessToken: string;
+  refreshToken?: string;
+  expiresAt?: string;
+  accountId?: string;
+}
+
+export const fetchDropboxStatus = (token: string) =>
+  request<DropboxStatus>("/api/integrations/dropbox/status", {
+    method: "GET",
+    token,
+  });
+
+export const connectDropbox = (token: string, payload: DropboxConnectPayload) =>
+  request<{ connected: boolean; connectedAt: string; accountId?: string | null }>("/api/integrations/dropbox/connect", {
+    method: "POST",
+    token,
+    body: JSON.stringify(payload),
+  });
+
+export const disconnectDropbox = (token: string) =>
+  request<void>("/api/integrations/dropbox/connect", {
+    method: "DELETE",
+    token,
+  });

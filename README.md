@@ -54,6 +54,52 @@ dotnet run --project Native.Api
 
 The API listens on `http://localhost:5000` by default (see `Program.cs` for configuration details).
 
+#### Dropbox integration
+
+The backend exposes `/api/integrations/dropbox/*` endpoints that manage the Dropbox connection on a per-user basis. To enable the
+flow:
+
+1. [Create a Dropbox app](https://www.dropbox.com/developers/apps) and configure an OAuth 2 redirect URI (e.g. `http://localhost:5173/auth/dropbox`).
+2. Add the credentials to the backend configuration via environment variables or `appsettings.Development.json`:
+
+   ```bash
+   export Dropbox__ClientId="<your-app-key>"
+   export Dropbox__ClientSecret="<your-app-secret>"
+   export Dropbox__RedirectUri="http://localhost:5173/auth/dropbox"
+   # Optional: override scopes (defaults to files.metadata.read files.content.write)
+   # export Dropbox__Scopes__0="files.metadata.read"
+   # export Dropbox__Scopes__1="files.content.write"
+   ```
+
+3. Start the backend and log in via the UI. The **Integrations** widget now shows the Dropbox connection status.
+4. To generate an authorization URL, call `GET /api/integrations/dropbox/status` with your access token. The response includes `authorizationUrl` and a `state` parameter. Visit that URL in a browser to grant access.
+5. Exchange the resulting authorization code for tokens using the Dropbox token endpoint, for example:
+
+   ```bash
+   curl https://api.dropboxapi.com/oauth2/token \
+     -d code="<code-from-redirect>" \
+     -d grant_type=authorization_code \
+     -d client_id="$Dropbox__ClientId" \
+     -d client_secret="$Dropbox__ClientSecret" \
+     -d redirect_uri="$Dropbox__RedirectUri"
+   ```
+
+6. Persist the tokens by calling `POST /api/integrations/dropbox/connect` with the access token payload:
+
+   ```bash
+   curl -X POST http://localhost:5000/api/integrations/dropbox/connect \
+     -H "Authorization: Bearer <jwt-token>" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "accessToken": "<dropbox-access-token>",
+       "refreshToken": "<dropbox-refresh-token>",
+       "expiresAt": "2024-12-31T23:59:59Z",
+       "accountId": "dbid:example"
+     }'
+   ```
+
+   The response confirms the connection and the UI updates automatically. Disconnect at any time with `DELETE /api/integrations/dropbox/connect`.
+
 #### Default accounts
 
 The API seeds a few demo users the first time it starts. All passwords are `Native!123`.

@@ -11,6 +11,7 @@ using Native.Api.Hubs;
 using Native.Core.Entities;
 using Native.Core.Interfaces;
 using Native.Core.Services;
+using Native.Api.Options;
 using Native.Infrastructure.Data;
 using Native.Infrastructure.Repositories;
 using Serilog;
@@ -97,6 +98,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+builder.Services.Configure<DropboxOptions>(builder.Configuration.GetSection("Dropbox"));
 
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
@@ -105,6 +107,7 @@ builder.Services.AddScoped<ICalendarEventRepository, CalendarEventRepository>();
 builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
 builder.Services.AddScoped<ITaskAttachmentRepository, TaskAttachmentRepository>();
 builder.Services.AddScoped<IJobOpeningRepository, JobOpeningRepository>();
+builder.Services.AddScoped<IIntegrationConnectionRepository, IntegrationConnectionRepository>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddScoped<ITaskService, TaskService>();
@@ -114,6 +117,7 @@ builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
 builder.Services.AddScoped<ITaskAttachmentService, TaskAttachmentService>();
 builder.Services.AddScoped<IJobOpeningService, JobOpeningService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IIntegrationService, IntegrationService>();
 
 var app = builder.Build();
 

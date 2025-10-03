@@ -22,6 +22,7 @@ public class NativeDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     public DbSet<CalendarEvent> CalendarEvents => Set<CalendarEvent>();
     public DbSet<JobOpening> JobOpenings => Set<JobOpening>();
     public DbSet<JobApplication> JobApplications => Set<JobApplication>();
+    public DbSet<IntegrationConnection> IntegrationConnections => Set<IntegrationConnection>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -99,5 +100,29 @@ public class NativeDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
             .WithMany(o => o.Applications)
             .HasForeignKey(a => a.JobOpeningId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<IntegrationConnection>()
+            .Property(c => c.Provider)
+            .HasMaxLength(64);
+
+        modelBuilder.Entity<IntegrationConnection>()
+            .Property(c => c.AccountId)
+            .HasMaxLength(128);
+
+        modelBuilder.Entity<IntegrationConnection>()
+            .HasIndex(c => new { c.Provider, c.UserId })
+            .IsUnique();
+
+        modelBuilder.Entity<IntegrationConnection>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<IntegrationConnection>()
+            .HasOne<Organization>()
+            .WithMany()
+            .HasForeignKey(c => c.OrganizationId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
