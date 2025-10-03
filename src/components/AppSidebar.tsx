@@ -232,7 +232,12 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
 
-          <div className="mt-auto pt-6">
+          <div
+            className={cn(
+              "mt-auto pt-6",
+              collapsed && "pb-10",
+            )}
+          >
             <Button
               variant="ghost"
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
