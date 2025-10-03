@@ -12,7 +12,7 @@ import Careers from "./pages/Careers";
 import Settings from "./pages/Settings";
 import Search from "./pages/Search";
 import Notifications from "./pages/Notifications";
-import Demo from "./pages/Demo";
+import Dashboards from "./pages/Dashboards";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -42,7 +42,7 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/search" element={<Search />} />
               <Route path="/notifications" element={<Notifications />} />
-              <Route path="/demo" element={<Demo />} />
+              <Route path="/dashboards" element={<Dashboards />} />
               <Route path="/goals" element={<Goals />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -40,7 +40,7 @@ export function WelcomeBanner() {
                 </Link>
               </Button>
               <Button asChild variant="outline">
-                <Link to="/demo">Watch Demo</Link>
+                <Link to="/dashboards">View dashboards</Link>
               </Button>
             </div>
           </div>

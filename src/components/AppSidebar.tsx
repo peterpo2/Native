@@ -46,7 +46,7 @@ const spaceNavItems = [
 
 const resourcesNavItems = [
   { title: "Careers", url: "/careers", icon: Briefcase },
-  { title: "Dashboards", url: "/demo", icon: Layout },
+  { title: "Dashboards", url: "/dashboards", icon: Layout },
   { title: "Docs", url: "/files", icon: FileText },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
