@@ -22,12 +22,14 @@ public class IntegrationConnectionRepository : GenericRepository<IntegrationConn
     public async Task<IntegrationConnection> UpsertAsync(IntegrationConnection connection, CancellationToken cancellationToken = default)
     {
         var existing = await Context.IntegrationConnections
+            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(
                 c => c.UserId == connection.UserId && c.Provider == connection.Provider,
                 cancellationToken);
 
         if (existing is null)
         {
+            connection.IsDeleted = false;
             await DbSet.AddAsync(connection, cancellationToken);
             await Context.SaveChangesAsync(cancellationToken);
             return connection;
@@ -39,6 +41,7 @@ public class IntegrationConnectionRepository : GenericRepository<IntegrationConn
         existing.ExpiresAt = connection.ExpiresAt;
         existing.OrganizationId = connection.OrganizationId;
         existing.ConnectedAt = connection.ConnectedAt;
+        existing.IsDeleted = false;
 
         await Context.SaveChangesAsync(cancellationToken);
         return existing;
@@ -47,6 +50,7 @@ public class IntegrationConnectionRepository : GenericRepository<IntegrationConn
     public async Task RemoveAsync(Guid userId, string provider, CancellationToken cancellationToken = default)
     {
         var existing = await Context.IntegrationConnections
+            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(c => c.UserId == userId && c.Provider == provider, cancellationToken);
 
         if (existing is null)
@@ -54,7 +58,8 @@ public class IntegrationConnectionRepository : GenericRepository<IntegrationConn
             return;
         }
 
-        Context.IntegrationConnections.Remove(existing);
+        existing.IsDeleted = true;
+        Context.Entry(existing).State = EntityState.Modified;
         await Context.SaveChangesAsync(cancellationToken);
     }
 }

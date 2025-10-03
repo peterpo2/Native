@@ -30,11 +30,28 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity>
         => await DbSet.AsNoTracking().ToListAsync(cancellationToken);
 
     public virtual async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-        => await DbSet.FindAsync(new object?[] { id }, cancellationToken);
+    {
+        var entity = await DbSet.FindAsync(new object?[] { id }, cancellationToken);
+        if (entity is ISoftDeletable softDeletable && softDeletable.IsDeleted)
+        {
+            return null;
+        }
+
+        return entity;
+    }
 
     public Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        DbSet.Remove(entity);
+        if (entity is ISoftDeletable softDeletable)
+        {
+            softDeletable.IsDeleted = true;
+            Context.Entry(entity).State = EntityState.Modified;
+        }
+        else
+        {
+            DbSet.Remove(entity);
+        }
+
         return Task.CompletedTask;
     }
 

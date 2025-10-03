@@ -43,7 +43,8 @@ public class CalendarBoardRepository : GenericRepository<CalendarBoard>, ICalend
     public async Task<CalendarBoard?> GetWithSharesAsync(Guid calendarId, CancellationToken cancellationToken = default)
     {
         return await Context.Calendars
+            .IgnoreQueryFilters()
             .Include(c => c.SharedUsers)
-            .FirstOrDefaultAsync(c => c.Id == calendarId, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == calendarId && !c.IsDeleted, cancellationToken);
     }
 }

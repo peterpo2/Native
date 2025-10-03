@@ -67,6 +67,56 @@ export const registerRequest = (payload: RegisterPayload) =>
     body: JSON.stringify(payload),
   });
 
+export interface AdminUser {
+  id: string;
+  email: string;
+  fullName: string;
+  role: string;
+  organizationId?: string | null;
+  isTwoFactorEnabled: boolean;
+  createdAt: string;
+}
+
+export interface CreateUserPayload {
+  email: string;
+  password: string;
+  fullName: string;
+  role?: string | null;
+  organizationId?: string | null;
+}
+
+export interface UpdateUserPayload {
+  fullName?: string;
+  role?: string | null;
+  twoFactorEnabled?: boolean;
+}
+
+export const fetchUsers = (token: string) =>
+  request<AdminUser[]>("/api/users", {
+    method: "GET",
+    token,
+  });
+
+export const createUser = (token: string, payload: CreateUserPayload) =>
+  request<AdminUser>("/api/users", {
+    method: "POST",
+    token,
+    body: JSON.stringify(payload),
+  });
+
+export const updateUser = (token: string, userId: string, payload: UpdateUserPayload) =>
+  request<AdminUser>(`/api/users/${userId}`, {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(payload),
+  });
+
+export const deleteUser = (token: string, userId: string) =>
+  request<void>(`/api/users/${userId}`, {
+    method: "DELETE",
+    token,
+  });
+
 export interface TaskInput {
   projectId?: string | null;
   title: string;
