@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Native.Core.Interfaces;
 
 namespace Native.Core.Entities;
 
-public class JobOpening
+public class JobOpening : ISoftDeletable
 {
     public Guid Id { get; set; }
     public Guid OrgId { get; set; }
@@ -14,4 +15,5 @@ public class JobOpening
     public bool IsPublished { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<JobApplication> Applications { get; set; } = new List<JobApplication>();
+    public bool IsDeleted { get; set; }
 }

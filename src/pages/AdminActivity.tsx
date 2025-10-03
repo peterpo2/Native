@@ -1,8 +1,10 @@
 import { useMemo } from "react";
 import { ShieldCheck, ListFilter, ListOrdered } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +31,11 @@ const AdminActivity = () => {
         <PageHeader
           title="Admin activity monitor"
           description="Review a complete audit feed of every workspace movement, including security events and sensitive updates."
+          actions={
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/admin">Admin panel</Link>
+            </Button>
+          }
         />
 
         <div className="p-6 space-y-6">

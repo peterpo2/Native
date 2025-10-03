@@ -229,14 +229,14 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-          <div
-            className={cn(
-              "mt-auto pt-6",
-              collapsed && "pb-10",
-            )}
+        <div
+          className={cn(
+            "mt-auto pt-6",
+            collapsed && "pb-10",
+          )}
           >
             <Button
               variant="ghost"

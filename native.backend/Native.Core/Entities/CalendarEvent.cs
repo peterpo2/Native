@@ -1,8 +1,10 @@
 using System;
 
+using Native.Core.Interfaces;
+
 namespace Native.Core.Entities;
 
-public class CalendarEvent
+public class CalendarEvent : ISoftDeletable
 {
     public Guid Id { get; set; }
     public Guid CalendarId { get; set; }
@@ -17,4 +19,5 @@ public class CalendarEvent
     public string ExternalEventId { get; set; } = string.Empty;
     [System.Text.Json.Serialization.JsonIgnore]
     public CalendarBoard? Calendar { get; set; }
+    public bool IsDeleted { get; set; }
 }

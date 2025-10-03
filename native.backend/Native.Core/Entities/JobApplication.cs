@@ -1,8 +1,10 @@
 using System;
 
+using Native.Core.Interfaces;
+
 namespace Native.Core.Entities;
 
-public class JobApplication
+public class JobApplication : ISoftDeletable
 {
     public Guid Id { get; set; }
     public Guid JobOpeningId { get; set; }
@@ -13,4 +15,5 @@ public class JobApplication
     public string? ResumeUrl { get; set; }
     public string? Notes { get; set; }
     public DateTime AppliedAt { get; set; } = DateTime.UtcNow;
+    public bool IsDeleted { get; set; }
 }

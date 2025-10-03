@@ -19,6 +19,8 @@ import Register from "./pages/Register";
 import Goals from "./pages/Goals";
 import TimeOff from "./pages/TimeOff";
 import AdminActivity from "./pages/AdminActivity";
+import AdminUsers from "./pages/AdminUsers";
+import AdminPanel from "./pages/AdminPanel";
 import { AuthProvider } from "./context/AuthContext";
 import { RequireAuth } from "./components/RequireAuth";
 import { RequireAdmin } from "./components/RequireAdmin";
@@ -49,7 +51,9 @@ const App = () => (
               <Route path="/goals" element={<Goals />} />
               <Route path="/time-off" element={<TimeOff />} />
               <Route element={<RequireAdmin />}>
+                <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/admin/activity" element={<AdminActivity />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
               </Route>
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

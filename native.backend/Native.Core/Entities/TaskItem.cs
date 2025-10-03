@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Native.Core.Interfaces;
 
 namespace Native.Core.Entities;
 
-public class TaskItem
+public class TaskItem : ISoftDeletable
 {
     public Guid Id { get; set; }
     public Guid? ProjectId { get; set; }
@@ -17,4 +18,5 @@ public class TaskItem
     public DateTime? CompletedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<TaskAttachment> Attachments { get; set; } = new List<TaskAttachment>();
+    public bool IsDeleted { get; set; }
 }

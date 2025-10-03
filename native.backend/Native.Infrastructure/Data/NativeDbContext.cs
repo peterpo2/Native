@@ -1,8 +1,12 @@
 using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Native.Core.Entities;
+using Native.Core.Interfaces;
 using Native.Infrastructure.Config;
 
 namespace Native.Infrastructure.Data;
@@ -31,7 +35,7 @@ public class NativeDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
         modelBuilder.ApplyConfiguration(new TaskItemConfiguration());
 
         modelBuilder.Entity<User>()
-            .HasIndex(u => u.Email)
+            .HasIndex(u => new { u.Email, u.IsDeleted })
             .IsUnique();
 
         modelBuilder.Entity<User>()
@@ -39,6 +43,10 @@ public class NativeDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
             .WithMany(o => o.Users)
             .HasForeignKey(u => u.OrganizationId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<IntegrationConnection>()
+            .HasIndex(c => new { c.Provider, c.UserId, c.IsDeleted })
+            .IsUnique();
 
         modelBuilder.Entity<Project>()
             .Property(p => p.Color)
@@ -110,10 +118,6 @@ public class NativeDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
             .HasMaxLength(128);
 
         modelBuilder.Entity<IntegrationConnection>()
-            .HasIndex(c => new { c.Provider, c.UserId })
-            .IsUnique();
-
-        modelBuilder.Entity<IntegrationConnection>()
             .HasOne<User>()
             .WithMany()
             .HasForeignKey(c => c.UserId)
@@ -124,5 +128,49 @@ public class NativeDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
             .WithMany()
             .HasForeignKey(c => c.OrganizationId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        ApplySoftDeleteQueryFilters(modelBuilder);
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        ApplySoftDeleteStateChanges();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        ApplySoftDeleteStateChanges();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    private void ApplySoftDeleteStateChanges()
+    {
+        foreach (var entry in ChangeTracker.Entries<ISoftDeletable>())
+        {
+            if (entry.State == EntityState.Deleted)
+            {
+                entry.State = EntityState.Modified;
+                entry.Entity.IsDeleted = true;
+            }
+        }
+    }
+
+    private static void ApplySoftDeleteQueryFilters(ModelBuilder modelBuilder)
+    {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (!typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
+            {
+                continue;
+            }
+
+            var parameter = Expression.Parameter(entityType.ClrType, "entity");
+            var property = Expression.Property(parameter, nameof(ISoftDeletable.IsDeleted));
+            var body = Expression.Equal(property, Expression.Constant(false));
+            var lambda = Expression.Lambda(body, parameter);
+
+            modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+        }
     }
 }

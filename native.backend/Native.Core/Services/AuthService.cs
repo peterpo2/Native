@@ -50,7 +50,7 @@ public class AuthService : IAuthService
     public async Task<AuthResult?> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
     {
         var user = await _userManager.FindByEmailAsync(email);
-        if (user is null)
+        if (user is null || user.IsDeleted)
         {
             return null;
         }

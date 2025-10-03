@@ -55,10 +55,31 @@ public class CalendarService : ICalendarService
         calendar.Name = name;
         calendar.Visibility = visibility;
 
-        calendar.SharedUsers.Clear();
-        foreach (var share in BuildShares(calendar.Id, visibility, sharedUserIds))
+        var desiredShares = visibility == CalendarVisibility.Shared
+            ? sharedUserIds.Where(id => id != Guid.Empty).Distinct().ToList()
+            : new List<Guid>();
+
+        foreach (var share in calendar.SharedUsers)
         {
-            calendar.SharedUsers.Add(share);
+            share.IsDeleted = true;
+        }
+
+        foreach (var userId in desiredShares)
+        {
+            var existingShare = calendar.SharedUsers.FirstOrDefault(s => s.UserId == userId);
+            if (existingShare is null)
+            {
+                calendar.SharedUsers.Add(new CalendarShare
+                {
+                    CalendarId = calendar.Id,
+                    UserId = userId,
+                    IsDeleted = false
+                });
+            }
+            else
+            {
+                existingShare.IsDeleted = false;
+            }
         }
 
         await _calendarRepository.SaveChangesAsync(cancellationToken);
@@ -168,7 +189,7 @@ public class CalendarService : ICalendarService
         return sharedUserIds
             .Where(id => id != Guid.Empty)
             .Distinct()
-            .Select(id => new CalendarShare { CalendarId = calendarId, UserId = id })
+            .Select(id => new CalendarShare { CalendarId = calendarId, UserId = id, IsDeleted = false })
             .ToList();
     }
 }
