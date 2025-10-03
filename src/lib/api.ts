@@ -1,10 +1,10 @@
-const API_BASE_URL = (() => {
+const API_BASE_URLS = (() => {
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+    return [import.meta.env.VITE_API_URL];
   }
 
   if (typeof window === "undefined") {
-    return "";
+    return [""];
   }
 
   const host = window.location.hostname;
@@ -14,7 +14,14 @@ const API_BASE_URL = (() => {
     host === "0.0.0.0" ||
     host.endsWith(".localhost");
 
-  return isLocalHost ? "https://localhost:5001" : window.location.origin;
+  if (!isLocalHost) {
+    return [window.location.origin];
+  }
+
+  const secureOrigin = `https://${host}:5001`;
+  const insecureOrigin = `http://${host}:5000`;
+
+  return [secureOrigin, insecureOrigin];
 })();
 
 async function request<T>(
@@ -29,25 +36,42 @@ async function request<T>(
     headers.set("Authorization", `Bearer ${options.token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  let lastError: unknown;
 
-  if (response.status === 204) {
-    return undefined as T;
+  for (let index = 0; index < API_BASE_URLS.length; index += 1) {
+    const baseUrl = API_BASE_URLS[index];
+    const isLastAttempt = index === API_BASE_URLS.length - 1;
+
+    try {
+      const response = await fetch(`${baseUrl}${path}`, {
+        ...options,
+        headers,
+      });
+
+      if (response.status === 204) {
+        return undefined as T;
+      }
+
+      const contentType = response.headers.get("Content-Type");
+      const isJson = contentType?.includes("application/json");
+      const payload = isJson ? await response.json() : await response.text();
+
+      if (!response.ok) {
+        const message = typeof payload === "string" ? payload : payload?.message ?? "Request failed";
+        throw new Error(message);
+      }
+
+      return payload as T;
+    } catch (error) {
+      const isNetworkError = error instanceof TypeError;
+      if (!isNetworkError || isLastAttempt) {
+        throw error;
+      }
+      lastError = error;
+    }
   }
 
-  const contentType = response.headers.get("Content-Type");
-  const isJson = contentType?.includes("application/json");
-  const payload = isJson ? await response.json() : await response.text();
-
-  if (!response.ok) {
-    const message = typeof payload === "string" ? payload : payload?.message ?? "Request failed";
-    throw new Error(message);
-  }
-
-  return payload as T;
+  throw lastError instanceof Error ? lastError : new Error("Request failed");
 }
 
 export interface LoginPayload {
